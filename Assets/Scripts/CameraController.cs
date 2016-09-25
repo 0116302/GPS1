@@ -3,7 +3,6 @@ using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 
-
 public class CameraController : MonoBehaviour {
 
 	public Room startingRoom;
@@ -18,7 +17,6 @@ public class CameraController : MonoBehaviour {
 	bool _isInPlacementMode = false;
 
 	void Start () {
-		GetComponent<Camera> ().transparencySortMode = TransparencySortMode.Orthographic;
 		MoveToRoom (startingRoom);
 	}
 	
