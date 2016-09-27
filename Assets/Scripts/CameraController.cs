@@ -15,7 +15,10 @@ public class CameraController : MonoBehaviour {
 
 	public Text roomNameDisplay;
 
-	bool _isInPlacementMode = false;
+	private bool _isInPlacementMode = false;
+	public bool isInPlacementMode {
+		get { return _isInPlacementMode; }
+	}
 
 	void Start () {
 		GetComponent<Camera> ().transparencySortMode = TransparencySortMode.Orthographic;
