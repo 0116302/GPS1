@@ -11,7 +11,7 @@ public class FlameDamage : MonoBehaviour
 		if (other.CompareTag ("Player")) 
 		{
 			HealthDisplay.health -= flameDamage;
-			other.GetComponent<Player>().hp -= flameDamage;
+			Player.hp -= flameDamage;
 		}
 	}
 }

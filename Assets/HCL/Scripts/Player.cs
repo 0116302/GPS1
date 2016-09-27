@@ -1,11 +1,11 @@
 ﻿using UnityEngine;
-using System.Collections;
 using UnityEngine.SceneManagement;
+using System.Collections;
 
 public class Player : MonoBehaviour
 {
 	public float speed;
-	public int hp = 50;
+	public static int hp = 10;
 	public new CameraFollow camera;
 
 	Vector3 velocity;
@@ -25,8 +25,8 @@ public class Player : MonoBehaviour
 		if(hp <= 0)
 		{
 			camera.enabled = false;
-			Destroy (this.gameObject); 
-			SceneManager.LoadSceneAsync(0);
+			Destroy (this.gameObject);
+			//SceneManager.LoadScene("GameScene"); // WTF NOT WORKING?
 		}
 	}
 }

@@ -11,7 +11,7 @@ public class LightBoomDamage : MonoBehaviour
 		if (other.CompareTag ("Player")) 
 		{
 			HealthDisplay.health -= lightboomDamage;
-			other.GetComponent<Player>().hp -= lightboomDamage;
+			Player.hp -= lightboomDamage;
 		}
 	}
 }

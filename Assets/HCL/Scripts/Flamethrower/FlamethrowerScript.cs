@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using UnityEngine.UI;
 using System.Collections;
 
 public class FlamethrowerScript : MonoBehaviour
@@ -9,20 +8,14 @@ public class FlamethrowerScript : MonoBehaviour
 	public Transform target;
 	public float range;
 
-	public Text myText;
-	public float duration;
-	public bool displayInfo;
 
-	void Start ()
+	void Start()
 	{
 		target = GameObject.FindGameObjectWithTag ("Player").transform;
-
-		myText = GameObject.Find("FlamethrowerInfoText").GetComponent<Text>();
-		myText.color = Color.clear;
 	}
 
 
-	void Update ()
+	void Update()
 	{
 		float dist = (Vector3.Distance(this.transform.position, target.transform.position));
 		if (dist < range)
@@ -34,34 +27,20 @@ public class FlamethrowerScript : MonoBehaviour
 
 			this.transform.rotation = Quaternion.Lerp (this.transform.rotation, Quaternion.Euler (0f, 0f, angle - 90f), Time.deltaTime * 3f);
 		}
-		ShowInfo();
+		Stop();
 	}
 
 
-	void OnMouseDown ()
+	void OnMouseDown()
 	{
 		Instantiate (projectile, shotPosition.position, shotPosition.rotation);
 	}
 
-	void OnMouseOver()
+	void Stop()
 	{
-		displayInfo = true;
-	}
-
-	void OnMouseExit()
-	{
-		displayInfo = false;
-	}
-
-	void ShowInfo()
-	{
-		if(displayInfo)
+		if(Player.hp == 0)
 		{
-			myText.color = Color.Lerp (myText.color, Color.black, duration * Time.deltaTime);
-		}
-		else
-		{
-			myText.color = Color.Lerp (myText.color, Color.clear, duration * Time.deltaTime);
+			gameObject.SetActive(false);
 		}
 	}
 }

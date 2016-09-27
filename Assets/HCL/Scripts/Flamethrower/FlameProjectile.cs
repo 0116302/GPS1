@@ -3,13 +3,12 @@ using System.Collections;
 
 public class FlameProjectile : MonoBehaviour
 {
-
 	public float speed;
 	public Vector3 direction;
 	public GameObject explosion;
 
 
-	void Update () 
+	void Update() 
 	{
 		this.transform.Translate (Vector3.down * Time.deltaTime * speed);
 	}

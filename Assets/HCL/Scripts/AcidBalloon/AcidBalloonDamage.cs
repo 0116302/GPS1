@@ -3,7 +3,6 @@ using System.Collections;
 
 public class AcidBalloonDamage : MonoBehaviour
 {
-
 	public int acidDamage;
 
 
@@ -12,7 +11,7 @@ public class AcidBalloonDamage : MonoBehaviour
 		if (other.CompareTag ("Player")) 
 		{
 			HealthDisplay.health -= acidDamage;
-			other.GetComponent<Player>().hp -= acidDamage;
+			Player.hp -= acidDamage;
 		}
 	}
 }

@@ -17,7 +17,7 @@ public class CameraFollow : MonoBehaviour
 	{
 		player = GameObject.FindGameObjectWithTag("Player").transform;
 	}
-		
+
 
 	bool CheckXMargin()
 	{
@@ -43,10 +43,14 @@ public class CameraFollow : MonoBehaviour
 		float targetY = transform.position.y;
 
 		if(CheckXMargin())
+		{
 			targetX = Mathf.Lerp(transform.position.x, player.position.x, xSmooth * Time.deltaTime);
+		}
 
 		if(CheckYMargin())
+		{
 			targetY = Mathf.Lerp(transform.position.y, player.position.y, ySmooth * Time.deltaTime);
+		}
 
 		targetX = Mathf.Clamp(targetX, minXAndY.x, maxXAndY.x);
 		targetY = Mathf.Clamp(targetY, minXAndY.y, maxXAndY.y);

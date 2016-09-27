@@ -12,7 +12,7 @@ public class HealthDisplay : MonoBehaviour
 	void Awake()
 	{
 		healthText = GetComponent<Text> ();
-		health = 50;
+		health = Player.hp;
 	}
 
 
