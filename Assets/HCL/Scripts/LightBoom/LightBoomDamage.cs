@@ -10,8 +10,8 @@ public class LightBoomDamage : MonoBehaviour
 	{
 		if (other.CompareTag ("Player")) 
 		{
-			HealthDisplay.health -= lightboomDamage;
-			Player.hp -= lightboomDamage;
+			Player player = other.GetComponent<Player> ();
+			player.hp -= lightboomDamage;
 		}
 	}
 }
