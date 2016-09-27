@@ -5,7 +5,7 @@ using System.Collections;
 public class Player : MonoBehaviour
 {
 	public float speed;
-	public static int hp = 10;
+	public int hp = 10;
 	public new CameraFollow camera;
 
 	Vector3 velocity;
@@ -26,7 +26,8 @@ public class Player : MonoBehaviour
 		{
 			camera.enabled = false;
 			Destroy (this.gameObject);
-			//SceneManager.LoadScene("GameScene"); // WTF NOT WORKING?
+			Scene scene = SceneManager.GetActiveScene ();
+			SceneManager.LoadScene (scene.name);
 		}
 	}
 }

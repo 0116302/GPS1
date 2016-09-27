@@ -10,8 +10,8 @@ public class AcidBalloonDamage : MonoBehaviour
 	{
 		if (other.CompareTag ("Player")) 
 		{
-			HealthDisplay.health -= acidDamage;
-			Player.hp -= acidDamage;
+			Player player = other.GetComponent<Player> ();
+			player.hp -= acidDamage;
 		}
 	}
 }

@@ -4,20 +4,19 @@ using System.Collections;
 
 public class HealthDisplay : MonoBehaviour
 {
-	public static int health;
 
+	public Player player;
 	Text healthText;
 
 
 	void Awake()
 	{
 		healthText = GetComponent<Text> ();
-		health = Player.hp;
 	}
 
 
 	void Update()
 	{
-		healthText.text = "Health: " + health;
+		healthText.text = "Health: " + player.hp;
 	}
 }

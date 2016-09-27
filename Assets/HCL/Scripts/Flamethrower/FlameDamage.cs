@@ -10,8 +10,8 @@ public class FlameDamage : MonoBehaviour
 	{
 		if (other.CompareTag ("Player")) 
 		{
-			HealthDisplay.health -= flameDamage;
-			Player.hp -= flameDamage;
+			Player player = other.GetComponent<Player> ();
+			player.hp -= flameDamage;
 		}
 	}
 }
