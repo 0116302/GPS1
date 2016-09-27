@@ -6,6 +6,7 @@ public class Door : MonoBehaviour, ITriggerable {
 
 	public bool altDirection = false;
 	public bool openByDefault = true;
+	public bool playerControlled = true;
 
 	private bool _isOpen = false;
 	public bool isOpen {
@@ -30,7 +31,7 @@ public class Door : MonoBehaviour, ITriggerable {
 	}
 
 	public void OnTrigger () {
-		Toggle ();
+		if (playerControlled) Toggle ();
 	}
 
 	public void Open () {

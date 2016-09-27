@@ -1,27 +1,17 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Defense : Placeable, ITriggerable {
+public abstract class Defense : MonoBehaviour, ITriggerable {
 
-	// Use this for initialization
-	void Start () {
-	
-	}
-	
-	// Update is called once per frame
-	void Update () {
-	
-	}
-
-	public void OnHoverEnter() {
+	public virtual void OnHoverEnter() {
 
 	}
 
-	public void OnHoverExit() {
+	public virtual void OnHoverExit() {
 
 	}
 
-	public void OnTrigger() {
+	public virtual void OnTrigger() {
 		
 	}
 }

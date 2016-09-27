@@ -1,18 +1,22 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public abstract class Placeable : MonoBehaviour, IPlaceable {
+public class Placeable : MonoBehaviour, IPlaceable {
 
-	public virtual uint gridSnapX {
-		get { return 1; }
+	public uint horizontalSnap = 1;
+	public uint verticalSnap = 1;
+	public Vector3 offset = new Vector3 (0.5f, -0.5f, -0.0001f);
+
+	public uint gridSnapX {
+		get { return horizontalSnap; }
 	}
 
-	public virtual uint gridSnapY {
-		get { return 1; }
+	public uint gridSnapY {
+		get { return verticalSnap; }
 	}
 
-	public virtual Vector3 placementOffset {
-		get { return new Vector3 (0.5f, -0.5f, -0.0001f); }
+	public Vector3 placementOffset {
+		get { return offset; }
 	}
 
 	public virtual bool CanBePlacedHere (Room room) {

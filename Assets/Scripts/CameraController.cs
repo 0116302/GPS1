@@ -20,6 +20,8 @@ public class CameraController : MonoBehaviour {
 		get { return _isInPlacementMode; }
 	}
 
+	public GameObject enemyPrefab;
+
 	public float raycastDistance = 100.0f;
 
 	private Placeable _placing;
@@ -46,6 +48,12 @@ public class CameraController : MonoBehaviour {
 
 		// Toggle placement mode
 		if (Input.GetKeyDown(KeyCode.E)) TogglePlacementMode ();
+
+		// TEMPORARY
+		// Spawn enemy
+		if (Input.GetKeyDown(KeyCode.Q)) {
+			GameObject.Instantiate (enemyPrefab, new Vector3 (-2f, 8.5f, 0f), Quaternion.identity);
+		}
 
 		// Cursor raycast
 		Ray ray = Camera.main.ScreenPointToRay (Input.mousePosition);
@@ -156,8 +164,11 @@ public class CameraController : MonoBehaviour {
 
 	public void Place (GameObject prefab) {
 		if (_placing != null) Destroy (_placing.gameObject);
+
 		GameObject instance = GameObject.Instantiate (prefab);
 		_placing = instance.GetComponent<Placeable> ();
 		instance.SetActive (false);
+
+		EnterPlacementMode ();
 	}
 }
