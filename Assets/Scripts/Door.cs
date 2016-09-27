@@ -2,9 +2,10 @@
 using System.Collections;
 
 [RequireComponent(typeof(Animator))]
-public class Door : MonoBehaviour {
+public class Door : MonoBehaviour, ITriggerable {
 
 	public bool altDirection = false;
+	public bool openByDefault = true;
 
 	private bool _isOpen = false;
 	public bool isOpen {
@@ -16,9 +17,19 @@ public class Door : MonoBehaviour {
 	void Start () {
 		animator = GetComponent<Animator> ();
 		animator.SetBool ("altDirection", altDirection);
+
+		if (openByDefault) Open ();
 	}
 
-	void OnMouseDown () {
+	public void OnHoverEnter() {
+
+	}
+
+	public void OnHoverExit () {
+
+	}
+
+	public void OnTrigger () {
 		Toggle ();
 	}
 

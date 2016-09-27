@@ -20,6 +20,14 @@ public class CameraController : MonoBehaviour {
 		get { return _isInPlacementMode; }
 	}
 
+	public float raycastDistance = 100.0f;
+
+	private Placeable _placing;
+	private Vector3 _placementOrigin;
+	private Vector3 _cursor;
+	private bool _readyToPlace = false;
+	private ITriggerable _mouseOver;
+
 	void Start () {
 		GetComponent<Camera> ().transparencySortMode = TransparencySortMode.Orthographic;
 		MoveToRoom (startingRoom);
@@ -36,41 +44,120 @@ public class CameraController : MonoBehaviour {
 
 		MoveToRoom (target);
 
-		// Placement mode
+		// Toggle placement mode
 		if (Input.GetKeyDown(KeyCode.E)) TogglePlacementMode ();
+
+		// Cursor raycast
+		Ray ray = Camera.main.ScreenPointToRay (Input.mousePosition);
+		int layerMask = (_isInPlacementMode) ? (1 << 8) : (1 << 9); // Raycast only to either the placement grid OR interactive objects based on current mode
+
+		RaycastHit hit;
+		if (Physics.Raycast (ray, out hit, raycastDistance, layerMask, QueryTriggerInteraction.Collide)) {
+			if (_isInPlacementMode) {
+				if (_placing != null) {
+					_cursor = hit.point - _placementOrigin;
+					_cursor.z = _placementOrigin.z;
+
+					// Snap to grid
+					_cursor.x = (float)Mathf.Floor ((_cursor.x / (float)_placing.gridSnapX)) * _placing.gridSnapX;
+					_cursor.y = (float)Mathf.Ceil ((_cursor.y / (float)_placing.gridSnapY)) * _placing.gridSnapY;
+
+					if (!_placing.gameObject.activeSelf)
+						_placing.gameObject.SetActive (true);
+					_placing.transform.position = _placementOrigin + _cursor + _placing.placementOffset;
+
+					_readyToPlace = _placing.CanBePlacedHere (_currentRoom);
+
+				} else {
+					_readyToPlace = false;
+				}
+
+			} else {
+				ITriggerable triggerable = hit.collider.gameObject.GetComponent<ITriggerable> ();
+				if (triggerable != null) {
+					// Detect when the mouse is hovering over an interactive object
+					if (_mouseOver != triggerable) {
+						if (_mouseOver != null)
+							_mouseOver.OnHoverExit ();
+
+						_mouseOver = triggerable;
+						triggerable.OnHoverEnter ();
+					}
+				}
+			}
+
+		} else {
+			if (_isInPlacementMode) {
+				if (_placing != null && _placing.gameObject.activeSelf) {
+					_placing.gameObject.SetActive (false);
+				}
+
+				_readyToPlace = false;
+
+			} else {
+				if (_mouseOver != null) {
+					_mouseOver.OnHoverExit ();
+					_mouseOver = null;
+				}
+			}
+		}
+
+		// Interacting with objects
+		if (Input.GetButtonDown ("Interact")) {
+			if (_isInPlacementMode && _readyToPlace) {
+				if (_placing != null) {
+					_placing.OnPlace ();
+					_placing = null;
+				}
+
+			} else {
+				if (_mouseOver != null) {
+					_mouseOver.OnTrigger ();
+				}
+			}
+		}
 	}
 
-	void MoveToRoom (Room target) {
+	public void MoveToRoom (Room target) {
 		if (!target) return;
 
 		if (_isInPlacementMode) {
-			_currentRoom.placementPlane.gameObject.SetActive (false);
-			target.placementPlane.gameObject.SetActive (true);
+			_currentRoom.placementGrid.gameObject.SetActive (false);
+			target.placementGrid.gameObject.SetActive (true);
 		}
 		
 		transform.position = target.cameraPosition.position;
 		_currentRoom = target;
+		_placementOrigin = _currentRoom.placementGrid.position - new Vector3 (_currentRoom.placementGrid.localScale.x / 2f, _currentRoom.placementGrid.localScale.y / -2f, 0f);
 
 		if (roomNameDisplay)
 			roomNameDisplay.text = _currentRoom.roomName + " ┘";
 	}
 
-	void EnterPlacementMode () {
+	public void EnterPlacementMode () {
 		if (!currentRoom) return;
-		currentRoom.placementPlane.gameObject.SetActive (true);
+		currentRoom.placementGrid.gameObject.SetActive (true);
 		_isInPlacementMode = true;
 	}
 
-	void ExitPlacementMode () {
-		if (!currentRoom) return;
-		currentRoom.placementPlane.gameObject.SetActive (false);
+	public void ExitPlacementMode () {
+		if (_placing != null) Destroy (_placing.gameObject);
+		if (currentRoom != null) currentRoom.placementGrid.gameObject.SetActive (false);
+
 		_isInPlacementMode = false;
 	}
 
-	void TogglePlacementMode () {
+	public void TogglePlacementMode () {
 		if (_isInPlacementMode)
 			ExitPlacementMode (); 
 		else 
 			EnterPlacementMode ();
+	}
+
+	public void Place (GameObject prefab) {
+		if (_placing != null) Destroy (_placing.gameObject);
+		GameObject instance = GameObject.Instantiate (prefab);
+		_placing = instance.GetComponent<Placeable> ();
+		instance.SetActive (false);
 	}
 }
