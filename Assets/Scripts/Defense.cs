@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class AcidBalloon : Placeable, ITriggerable {
+public class Defense : Placeable, ITriggerable {
 
 	// Use this for initialization
 	void Start () {
