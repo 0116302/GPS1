@@ -3,18 +3,24 @@ using System.Collections;
 
 public class Enemy : Destructible {
 
+	Animator animator;
+
 	[Header("Death")]
 	public Transform head;
 	public GameObject decapitatedHeadPrefab;
 
 	// Use this for initialization
 	void Start () {
+		animator = GetComponent<Animator> ();
+
 		onDeath.AddListener (OnDeath);
 	}
 	
 	// Update is called once per frame
 	void Update () {
-	
+		Vector3 pos = transform.position;
+		//pos.z = 0.0f;
+		transform.position = pos;
 	}
 
 	void OnCollisionEnter(Collision collision) {
