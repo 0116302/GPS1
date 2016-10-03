@@ -6,7 +6,7 @@ public class Room : MonoBehaviour {
 	[Header("Room Setup")]
 	public string roomName = "Room";
 	public Transform cameraPosition;
-	public Transform placementPlane;
+	public Transform placementGrid;
 
 	[Header("Relative Position")]
 	public Room roomRight;

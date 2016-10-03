@@ -6,7 +6,8 @@ public class ZombiePlant : MonoBehaviour {
 	public float rearmTime;
 	private float rearmTimer;
 	public GameObject prefab;
-	Vector3 position = new Vector3(3.91f,0.658f,0);
+	Vector3 position = new Vector3(3.91f,0.658f,0);//use to spawn some cat
+
 	// Use this for initialization
 	void Start () {
 	
@@ -18,16 +19,25 @@ public class ZombiePlant : MonoBehaviour {
 			rearmTimer -= Time.deltaTime;
 			if (rearmTimer < 0) {
 				deactive = false;
-				this.GetComponent<SpriteRenderer>().color = Color.blue;
+				this.GetComponent<SpriteRenderer>().color = Color.white;
 			}
 		}
-		if(Input.GetKeyDown(KeyCode.Alpha1)){ 
+		if(Input.GetKeyDown(KeyCode.Alpha1)){//this is to spawn cat
 			Instantiate (prefab,position, Quaternion.identity);
 		}
 	}
 
 	void OnTriggerEnter(Collider Other){
-		if(Other.CompareTag("Cat") && deactive == false){
+		if(Other.CompareTag("Enemy") && deactive == false){
+			Other.GetComponent<Cat> ().hp -= Other.GetComponent<Cat> ().hp;
+			deactive = true;
+			this.GetComponent<SpriteRenderer>().color = Color.red;
+			rearmTimer = rearmTime;
+		}
+	}
+
+	void OnTriggerStay(Collider Other){
+		if(Other.CompareTag("Enemy") && deactive == false){
 			Other.GetComponent<Cat> ().hp -= Other.GetComponent<Cat> ().hp;
 			deactive = true;
 			this.GetComponent<SpriteRenderer>().color = Color.red;
