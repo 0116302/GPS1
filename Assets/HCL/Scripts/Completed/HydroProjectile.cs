@@ -11,7 +11,10 @@ public class HydroProjectile : MonoBehaviour
 	}
 
 	void OnCollisionEnter (Collision collision) {
-		collision.rigidbody.AddForce(-100f, 0f, 0f);
+		Destructible hit = collision.gameObject.GetComponent<Destructible> ();
+		if (hit != null) {
+			collision.rigidbody.AddForce(-100f, 0f, 0f); // I think its wrong, because there is both direction. -100f is always left.
+		}
 		Destroy (gameObject);
 	}
 }

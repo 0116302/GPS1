@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class LightBoomDamage : MonoBehaviour {
+public class MiniRocketDamage : MonoBehaviour {
 
 	public float damage = 1f;
 	public float lifetime;
@@ -11,7 +11,7 @@ public class LightBoomDamage : MonoBehaviour {
 		Destroy (gameObject, lifetime);
 	}
 
-	void OnTriggerEnter(Collider collision)
+	void OnCollisionEnter(Collision collision)
 	{
 		Destructible hit = collision.gameObject.GetComponent<Destructible> ();
 		if (hit != null) {

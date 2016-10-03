@@ -3,7 +3,7 @@ using System.Collections;
 
 public class AcidDamage : MonoBehaviour {
 
-	public float damage;
+	public float damage = 1f;
 	public float lifetime;
 
 	void Start()
