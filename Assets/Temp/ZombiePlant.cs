@@ -29,7 +29,7 @@ public class ZombiePlant : MonoBehaviour {
 
 	void OnTriggerEnter(Collider Other){
 		if(Other.CompareTag("Enemy") && deactive == false){
-			Other.GetComponent<Cat> ().hp -= Other.GetComponent<Cat> ().hp;
+			Other.GetComponent<Enemy> ().health -= Other.GetComponent<Enemy> ().maximumHealth;
 			deactive = true;
 			this.GetComponent<SpriteRenderer>().color = Color.red;
 			rearmTimer = rearmTime;
@@ -38,7 +38,7 @@ public class ZombiePlant : MonoBehaviour {
 
 	void OnTriggerStay(Collider Other){
 		if(Other.CompareTag("Enemy") && deactive == false){
-			Other.GetComponent<Cat> ().hp -= Other.GetComponent<Cat> ().hp;
+			Other.GetComponent<Enemy> ().health -= Other.GetComponent<Enemy> ().maximumHealth;
 			deactive = true;
 			this.GetComponent<SpriteRenderer>().color = Color.red;
 			rearmTimer = rearmTime;
