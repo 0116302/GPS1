@@ -221,6 +221,7 @@ public class CameraController : MonoBehaviour {
 	}
 
 	public void Place (GameObject prefab) {
+		if (!_zoomedIn) return;
 		if (_placing != null) Destroy (_placing.gameObject);
 
 		GameObject instance = GameObject.Instantiate (prefab);

@@ -191,6 +191,10 @@ public class EnemyProgressingState : IEnemyState {
 				Debug.Log (i);
 			}
 		}
+
+		if (Input.GetKeyDown (KeyCode.O)) {
+			Debug.Log (enemy.currentRoom.roomName);
+		}
 	}
 
 	public void ToExploreState () {
