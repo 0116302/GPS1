@@ -26,6 +26,8 @@ public class Enemy : Destructible {
 		get { return _currentRoom; }
 	}
 
+	private bool _isEnteringStaircase;
+
 	public enum RoomStatus {
 		Unvisited = 0,
 		Visited,
@@ -82,30 +84,29 @@ public class Enemy : Destructible {
 			if (room != currentRoom) {
 				_currentRoom = other.GetComponent<Room> ();
 				Debug.Log ("Enemy has entered " + _currentRoom.roomName);
-				progressingState.OnEnterRoom ();
 			}
 		}
 	}
 
-	void OnCollisionEnter (Collision collision) {
-		if (collision.gameObject.CompareTag("Door")) {
-			if ((collision.transform.position.x < transform.position.x && walkDirection == WalkDirection.Left) || (collision.transform.position.x > transform.position.x && walkDirection == WalkDirection.Right)) {
-				StartCoroutine (TryOpenDoor ());
-			}
-		}
-	}
-
-	private IEnumerator TryOpenDoor () {
-		walkDirection = WalkDirection.None;
-		animator.SetFloat ("MovementSpeed", 0.0f);
-		animator.SetBool ("TryingToOpenDoor", true);
-		progressingState.DoNotRepeat ();
-
-		yield return new WaitForSeconds (2.0f);
-
-		animator.SetBool ("TryingToOpenDoor", false);
-		progressingState.DetermineTarget ();
-	}
+//	void OnCollisionEnter (Collision collision) {
+//		if (collision.gameObject.CompareTag("Door")) {
+//			if ((collision.transform.position.x < transform.position.x && walkDirection == WalkDirection.Left) || (collision.transform.position.x > transform.position.x && walkDirection == WalkDirection.Right)) {
+//				StartCoroutine (TryOpenDoor ());
+//			}
+//		}
+//	}
+//
+//	private IEnumerator TryOpenDoor () {
+//		walkDirection = WalkDirection.None;
+//		animator.SetFloat ("MovementSpeed", 0.0f);
+//		animator.SetBool ("TryingToOpenDoor", true);
+//		progressingState.DoNotRepeat ();
+//
+//		yield return new WaitForSeconds (2.0f);
+//
+//		animator.SetBool ("TryingToOpenDoor", false);
+//		progressingState.DetermineTarget ();
+//	}
 
 	void OnDeath () {
 		Rigidbody decapitatedHead = ((GameObject) GameObject.Instantiate (decapitatedHeadPrefab, head.transform.position, head.transform.rotation)).GetComponent<Rigidbody> ();
@@ -132,6 +133,9 @@ public class Enemy : Destructible {
 	}
 
 	private IEnumerator EnterStaircaseCoroutine (Staircase staircase) {
+		if (_isEnteringStaircase) yield break;
+		_isEnteringStaircase = true;
+
 		Vector3 pos = transform.position;
 
 		float duration = 1.0f;
@@ -178,5 +182,7 @@ public class Enemy : Destructible {
 		}
 		pos.z = 0.0f;
 		transform.position = pos;
+
+		_isEnteringStaircase = false;
 	}
 }

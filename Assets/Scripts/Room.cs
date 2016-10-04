@@ -15,6 +15,9 @@ public class Room : MonoBehaviour {
 	public Room roomAbove;
 	public Room roomBelow;
 
+	[Header("Paths")]
+	public Door leftDoor;
+	public Door rightDoor;
 	public List<Staircase> staircases;
 
 	// Use this for initialization

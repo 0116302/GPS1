@@ -64,7 +64,7 @@ public class CameraController : MonoBehaviour {
 		// TEMPORARY
 		// Spawn enemy
 		if (Input.GetKeyDown(KeyCode.Q)) {
-			GameObject.Instantiate (enemyPrefab, new Vector3 (-2f, 8.5f, 0f), Quaternion.identity);
+			GameObject.Instantiate (enemyPrefab, new Vector3 (-1f, 8.5f, 0f), Quaternion.identity);
 		}
 
 		// Cursor raycast
