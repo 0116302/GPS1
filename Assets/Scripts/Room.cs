@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class Room : MonoBehaviour {
 
@@ -13,6 +14,8 @@ public class Room : MonoBehaviour {
 	public Room roomLeft;
 	public Room roomAbove;
 	public Room roomBelow;
+
+	public List<Staircase> staircases;
 
 	// Use this for initialization
 	void Start () {

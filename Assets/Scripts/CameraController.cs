@@ -24,6 +24,8 @@ public class CameraController : MonoBehaviour {
 
 	public float raycastDistance = 100.0f;
 
+	private bool _zooming = false;
+	private bool _zoomedIn = true;
 	private Placeable _placing;
 	private Vector3 _placementOrigin;
 	private Vector3 _cursor;
@@ -46,8 +48,18 @@ public class CameraController : MonoBehaviour {
 
 		MoveToRoom (target);
 
+		// Camera zooming
+		if (!_zooming) {
+			if (Input.GetAxis ("Mouse ScrollWheel") < 0) {
+				StartCoroutine (ZoomOut ());
+
+			} else if (Input.GetAxis ("Mouse ScrollWheel") > 0) {
+				StartCoroutine (ZoomIn ());
+			}
+		}
+
 		// Toggle placement mode
-		if (Input.GetKeyDown(KeyCode.E)) TogglePlacementMode ();
+		if (Input.GetKeyDown(KeyCode.E) && _zoomedIn) TogglePlacementMode ();
 
 		// TEMPORARY
 		// Spawn enemy
@@ -124,6 +136,52 @@ public class CameraController : MonoBehaviour {
 				}
 			}
 		}
+	}
+
+	public IEnumerator ZoomOut () {
+		_zooming = true;
+
+		ExitPlacementMode ();
+
+		Camera camera = GetComponent<Camera> ();
+		float startingFov = camera.fieldOfView;
+		float targetFov = 25.0f;
+
+		float duration = 0.25f;
+		float elapsedTime = 0.0f;
+
+		while (elapsedTime < duration) {
+			camera.fieldOfView = Mathf.Lerp (startingFov, targetFov, (elapsedTime / duration));
+
+			elapsedTime += Time.deltaTime;
+			yield return new WaitForEndOfFrame ();
+		}
+		camera.fieldOfView = targetFov;
+
+		_zooming = false;
+		_zoomedIn = false;
+	}
+
+	public IEnumerator ZoomIn () {
+		_zooming = true;
+
+		Camera camera = GetComponent<Camera> ();
+		float startingFov = camera.fieldOfView;
+		float targetFov = 12.0f;
+
+		float duration = 0.25f;
+		float elapsedTime = 0.0f;
+
+		while (elapsedTime < duration) {
+			camera.fieldOfView = Mathf.Lerp (startingFov, targetFov, (elapsedTime / duration));
+
+			elapsedTime += Time.deltaTime;
+			yield return new WaitForEndOfFrame ();
+		}
+		camera.fieldOfView = targetFov;
+
+		_zooming = false;
+		_zoomedIn = true;
 	}
 
 	public void MoveToRoom (Room target) {
