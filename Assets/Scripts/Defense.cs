@@ -7,6 +7,10 @@ public abstract class Defense : MonoBehaviour, ITriggerable {
 
 	}
 
+	public virtual void OnHoverStay() {
+
+	}
+
 	public virtual void OnHoverExit() {
 
 	}

@@ -4,6 +4,8 @@ using System.Collections.Generic;
 
 public class Enemy : Destructible {
 
+	public TextMesh healthDisplay; // TEMPORARY
+
 	[HideInInspector] public Animator animator;
 
 	public enum WalkDirection
@@ -70,6 +72,10 @@ public class Enemy : Destructible {
 		} else {
 			animator.SetFloat ("MovementSpeed", 0.0f);
 		}
+
+		if (healthDisplay != null) {
+			healthDisplay.text = new string ('♥', Mathf.CeilToInt(this.health / this.maximumHealth * 3.0f));
+		}
 	}
 
 	void FixedUpdate () {
@@ -83,7 +89,11 @@ public class Enemy : Destructible {
 			Room room = other.GetComponent<Room> ();
 			if (room != currentRoom) {
 				_currentRoom = other.GetComponent<Room> ();
-				Debug.Log ("Enemy has entered " + _currentRoom.roomName);
+				//Debug.Log ("Enemy has entered " + _currentRoom.roomName);
+
+				if (_currentRoom.roomName == "Control Room") {
+					GameObject.FindObjectOfType<GUIManager> ().Lose ();
+				}
 			}
 		}
 	}
@@ -111,6 +121,14 @@ public class Enemy : Destructible {
 	void OnDeath () {
 		Rigidbody decapitatedHead = ((GameObject) GameObject.Instantiate (decapitatedHeadPrefab, head.transform.position, head.transform.rotation)).GetComponent<Rigidbody> ();
 		decapitatedHead.AddForce (new Vector3(-0.5f, 2f, 0f), ForceMode.Impulse);
+
+		GameManager.enemyCount--;
+		if (GameManager.enemyCount == 0) {
+			// Win
+			GameObject.FindObjectOfType<GUIManager> ().Win ();
+
+		}
+
 		Destroy (gameObject);
 	}
 
@@ -124,7 +142,7 @@ public class Enemy : Destructible {
 	}
 
 	public void SetRoomStatus (Room room, RoomStatus status) {
-		Debug.Log ("Enemy set status of " + room.roomName + " to " + status.ToString());
+		//Debug.Log ("Enemy set status of " + room.roomName + " to " + status.ToString());
 		roomStatus[room] = status;
 	}
 

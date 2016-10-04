@@ -130,7 +130,7 @@ public class EnemyProgressingState : IEnemyState {
 					targetDoor = enemy.currentRoom.leftDoor;
 					targetRoom = enemy.currentRoom.roomLeft;
 					enemy.walkDirection = Enemy.WalkDirection.Left;
-					Debug.Log ("Enemy has chosen the left door");
+					//Debug.Log ("Enemy has chosen the left door");
 				}
 			}
 
@@ -141,7 +141,7 @@ public class EnemyProgressingState : IEnemyState {
 					targetDoor = enemy.currentRoom.rightDoor;
 					targetRoom = enemy.currentRoom.roomRight;
 					enemy.walkDirection = Enemy.WalkDirection.Right;
-					Debug.Log ("Enemy has chosen the right door");
+					//Debug.Log ("Enemy has chosen the right door");
 				}
 			}
 
@@ -154,7 +154,7 @@ public class EnemyProgressingState : IEnemyState {
 							targetStaircase = staircase;
 							targetRoom = staircase.destination.room;
 							enemy.walkDirection = (staircase.transform.position.x <= enemy.transform.position.x) ? Enemy.WalkDirection.Left : Enemy.WalkDirection.Right;
-							Debug.Log ("Enemy has chosen staircase " + staircase.name);
+							//Debug.Log ("Enemy has chosen staircase " + staircase.name);
 							break;
 						}
 					}
