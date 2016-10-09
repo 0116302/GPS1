@@ -11,9 +11,14 @@ public class Flamethrower : Defense, ITargeter {
 		get { return _target; }
 	}
 
+	private float cooldown = 0.0f;
+	public float cooldownDuration = 10.0f;
+
+	GUIManager guiManager;
+
 	// Use this for initialization
 	void Start () {
-	
+		guiManager = GameObject.FindObjectOfType<GUIManager> ();
 	}
 
 	// Update is called once per frame
@@ -27,22 +32,42 @@ public class Flamethrower : Defense, ITargeter {
 		} else {
 			transform.rotation = Quaternion.Lerp (transform.rotation, Quaternion.Euler (0f, 0f, 0f), 10f * Time.deltaTime);
 		}
+
+		if (cooldown > 0.0f) {
+			cooldown -= Time.deltaTime;
+
+		} else {
+			cooldown = 0.0f;
+		}
 	}
 
-	public void SetTarget(Transform target) {
+	public void SetTarget (Transform target) {
 		_target = target;
 	}
 
-	public override void OnHoverEnter() {
+	public override void OnHoverEnter () {
 
 	}
 
-	public override void OnHoverExit() {
+	public override void OnHoverStay () {
+		if (cooldown > 0.0f) {
+			guiManager.cooldownDisplay.text = "Cooldown: " + Mathf.CeilToInt (cooldown) + "s";
 
+		} else {
+			guiManager.cooldownDisplay.text = "";
+		}
 	}
 
-	public override void OnTrigger() {
-		Rigidbody shot = ((GameObject) GameObject.Instantiate (projectile, projectileSpawnPoint.position, projectileSpawnPoint.rotation)).GetComponent<Rigidbody> ();
-		shot.AddForce (-projectileSpawnPoint.up * 2f, ForceMode.Impulse);
+	public override void OnHoverExit () {
+		guiManager.cooldownDisplay.text = "";
+	}
+
+	public override void OnTrigger () {
+		if (cooldown <= 0.0f) {
+			Rigidbody shot = ((GameObject) GameObject.Instantiate (projectile, projectileSpawnPoint.position, projectileSpawnPoint.rotation)).GetComponent<Rigidbody> ();
+			shot.AddForce (-projectileSpawnPoint.up * 2f, ForceMode.Impulse);
+
+			cooldown = cooldownDuration;
+		}
 	}
 }

@@ -24,8 +24,12 @@ public class CameraController : MonoBehaviour {
 
 	public float raycastDistance = 100.0f;
 
+	private bool _zooming = false;
+	private bool _zoomedIn = true;
 	private Placeable _placing;
 	private Vector3 _placementOrigin;
+	private int _gridWidth = 0;
+	private int _gridHeight = 0;
 	private Vector3 _cursor;
 	private bool _readyToPlace = false;
 	private ITriggerable _mouseOver;
@@ -46,13 +50,21 @@ public class CameraController : MonoBehaviour {
 
 		MoveToRoom (target);
 
-		// Toggle placement mode
-		if (Input.GetKeyDown(KeyCode.E)) TogglePlacementMode ();
+		// Camera zooming
+		if (!_zooming) {
+			if (Input.GetAxis ("Mouse ScrollWheel") < 0) {
+				StartCoroutine (ZoomOut ());
 
-		// TEMPORARY
-		// Spawn enemy
-		if (Input.GetKeyDown(KeyCode.Q)) {
-			GameObject.Instantiate (enemyPrefab, new Vector3 (-2f, 8.5f, 0f), Quaternion.identity);
+			} else if (Input.GetAxis ("Mouse ScrollWheel") > 0) {
+				StartCoroutine (ZoomIn ());
+			}
+		}
+
+		// Toggle placement mode
+		//if (Input.GetKeyDown(KeyCode.E) && _zoomedIn) TogglePlacementMode ();
+
+		if (_isInPlacementMode && GameManager.gamePhase != GamePhase.Setup) {
+			ExitPlacementMode ();
 		}
 
 		// Cursor raycast
@@ -67,14 +79,17 @@ public class CameraController : MonoBehaviour {
 					_cursor.z = _placementOrigin.z;
 
 					// Snap to grid
-					_cursor.x = (float)Mathf.Floor ((_cursor.x / (float)_placing.gridSnapX)) * _placing.gridSnapX;
-					_cursor.y = (float)Mathf.Ceil ((_cursor.y / (float)_placing.gridSnapY)) * _placing.gridSnapY;
+					int cellX = Mathf.FloorToInt ((_cursor.x / (float)_placing.gridSnapX));
+					int cellY = Mathf.CeilToInt ((_cursor.y / (float)_placing.gridSnapY));
+
+					_cursor.x = (float)cellX * _placing.gridSnapX;
+					_cursor.y = (float)cellY * _placing.gridSnapY;
 
 					if (!_placing.gameObject.activeSelf)
 						_placing.gameObject.SetActive (true);
 					_placing.transform.position = _placementOrigin + _cursor + _placing.placementOffset;
 
-					_readyToPlace = _placing.CanBePlacedHere (_currentRoom);
+					_readyToPlace = _placing.CanBePlacedHere (cellX, cellY, _gridWidth, _gridHeight);
 
 				} else {
 					_readyToPlace = false;
@@ -89,7 +104,10 @@ public class CameraController : MonoBehaviour {
 							_mouseOver.OnHoverExit ();
 
 						_mouseOver = triggerable;
-						triggerable.OnHoverEnter ();
+						_mouseOver.OnHoverEnter ();
+
+					} else if (_mouseOver == triggerable) {
+						_mouseOver.OnHoverStay ();
 					}
 				}
 			}
@@ -114,16 +132,65 @@ public class CameraController : MonoBehaviour {
 		if (Input.GetButtonDown ("Interact")) {
 			if (_isInPlacementMode && _readyToPlace) {
 				if (_placing != null) {
+					GameManager.cash -= _placing.cost;
 					_placing.OnPlace ();
 					_placing = null;
+
+					ExitPlacementMode ();
 				}
 
-			} else {
+			} else if (GameManager.gamePhase == GamePhase.Raid) {
 				if (_mouseOver != null) {
 					_mouseOver.OnTrigger ();
 				}
 			}
 		}
+	}
+
+	public IEnumerator ZoomOut () {
+		_zooming = true;
+
+		ExitPlacementMode ();
+
+		Camera camera = GetComponent<Camera> ();
+		float startingFov = camera.fieldOfView;
+		float targetFov = 25.0f;
+
+		float duration = 0.25f;
+		float elapsedTime = 0.0f;
+
+		while (elapsedTime < duration) {
+			camera.fieldOfView = Mathf.Lerp (startingFov, targetFov, (elapsedTime / duration));
+
+			elapsedTime += Time.deltaTime;
+			yield return new WaitForEndOfFrame ();
+		}
+		camera.fieldOfView = targetFov;
+
+		_zooming = false;
+		_zoomedIn = false;
+	}
+
+	public IEnumerator ZoomIn () {
+		_zooming = true;
+
+		Camera camera = GetComponent<Camera> ();
+		float startingFov = camera.fieldOfView;
+		float targetFov = 12.0f;
+
+		float duration = 0.25f;
+		float elapsedTime = 0.0f;
+
+		while (elapsedTime < duration) {
+			camera.fieldOfView = Mathf.Lerp (startingFov, targetFov, (elapsedTime / duration));
+
+			elapsedTime += Time.deltaTime;
+			yield return new WaitForEndOfFrame ();
+		}
+		camera.fieldOfView = targetFov;
+
+		_zooming = false;
+		_zoomedIn = true;
 	}
 
 	public void MoveToRoom (Room target) {
@@ -137,6 +204,8 @@ public class CameraController : MonoBehaviour {
 		transform.position = target.cameraPosition.position;
 		_currentRoom = target;
 		_placementOrigin = _currentRoom.placementGrid.position - new Vector3 (_currentRoom.placementGrid.localScale.x / 2f, _currentRoom.placementGrid.localScale.y / -2f, 0f);
+		_gridWidth = Mathf.FloorToInt (_currentRoom.placementGrid.localScale.x);
+		_gridHeight = Mathf.FloorToInt (_currentRoom.placementGrid.localScale.y);
 
 		if (roomNameDisplay)
 			roomNameDisplay.text = _currentRoom.roomName + " ┘";
@@ -165,10 +234,17 @@ public class CameraController : MonoBehaviour {
 	public void Place (GameObject prefab) {
 		if (_placing != null) Destroy (_placing.gameObject);
 
+		if (GameManager.gamePhase != GamePhase.Setup || !_zoomedIn) return;
+
 		GameObject instance = GameObject.Instantiate (prefab);
 		_placing = instance.GetComponent<Placeable> ();
 		instance.SetActive (false);
 
-		EnterPlacementMode ();
+		if (GameManager.cash >= _placing.cost) {
+			EnterPlacementMode ();
+
+		} else {
+			Destroy (_placing.gameObject);
+		}
 	}
 }
