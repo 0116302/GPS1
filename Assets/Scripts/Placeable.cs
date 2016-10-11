@@ -16,6 +16,10 @@ public class Placeable : MonoBehaviour, IPlaceable {
 	public bool placeOnFloor = true;
 	public bool placeOnCeiling = true;
 	public bool placeOnWalls = true;
+	private bool isLeft = true;
+	public bool isOnLeft{
+		get {return isLeft; }
+	}
 
 	private Transform placementGrid;
 	private int _conflictCount = 0;
@@ -37,6 +41,7 @@ public class Placeable : MonoBehaviour, IPlaceable {
 		if (_conflictCount == 0) {
 			if (x == 0) {
 				// X = Left
+				isLeft = true;
 				if (y == 0) {
 					// Y = Ceiling
 					if (placeOnWalls || placeOnCeiling) return true;
@@ -69,6 +74,7 @@ public class Placeable : MonoBehaviour, IPlaceable {
 
 			} else if (x == gridWidth - width) {
 				// X = Right
+				isLeft = false;
 				if (y == 0) {
 					// Y = Ceiling
 					if (placeOnWalls || placeOnCeiling) return true;

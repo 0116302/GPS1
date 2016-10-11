@@ -27,6 +27,9 @@ public class CameraController : MonoBehaviour {
 	private bool _zooming = false;
 	private bool _zoomedIn = true;
 	private Placeable _placing;
+	public bool isOnLeft{
+		get {return _placing.isOnLeft; }
+	}
 	private Vector3 _placementOrigin;
 	private int _gridWidth = 0;
 	private int _gridHeight = 0;
