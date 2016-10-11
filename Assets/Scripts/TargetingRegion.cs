@@ -11,7 +11,7 @@ public class TargetingRegion : MonoBehaviour {
 		_targeter = targeterObject.GetComponent<ITargeter> ();
 	}
 
-	void OnTriggerEnter (Collider other) {
+	void OnTriggerStay (Collider other) {
 		if (_targeter != null && other.CompareTag(targetTag) && _targeter.target == null) {
 			_targeter.SetTarget (other.transform);
 		}

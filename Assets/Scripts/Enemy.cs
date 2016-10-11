@@ -16,6 +16,7 @@ public class Enemy : Destructible {
 	}
 
 	[Header("Movement")]
+	public bool canMove = true;
 	public float walkSpeed = 1.0f;
 	public WalkDirection walkDirection = WalkDirection.Right;
 
@@ -67,7 +68,7 @@ public class Enemy : Destructible {
 			transform.localScale = newScale;
 		}
 
-		if (walkDirection != WalkDirection.None) {
+		if (walkDirection != WalkDirection.None && canMove) {
 			animator.SetFloat ("MovementSpeed", walkSpeed);
 		} else {
 			animator.SetFloat ("MovementSpeed", 0.0f);
@@ -79,7 +80,7 @@ public class Enemy : Destructible {
 	}
 
 	void FixedUpdate () {
-		if (walkDirection != WalkDirection.None) {
+		if (walkDirection != WalkDirection.None && canMove) {
 			transform.Translate (new Vector3(walkSpeed * Time.deltaTime, 0.0f, 0.0f));
 		}
 	}
