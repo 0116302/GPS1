@@ -63,7 +63,7 @@ public class CameraController : MonoBehaviour {
 		// Toggle placement mode
 		//if (Input.GetKeyDown(KeyCode.E) && _zoomedIn) TogglePlacementMode ();
 
-		if (_isInPlacementMode && GameManager.gamePhase != GamePhase.Setup) {
+		if (_isInPlacementMode && GameManager.instance.gamePhase != GamePhase.Setup) {
 			ExitPlacementMode ();
 		}
 
@@ -132,14 +132,14 @@ public class CameraController : MonoBehaviour {
 		if (Input.GetButtonDown ("Interact")) {
 			if (_isInPlacementMode && _readyToPlace) {
 				if (_placing != null) {
-					GameManager.cash -= _placing.cost;
+					GameManager.instance.cash -= _placing.cost;
 					_placing.OnPlace ();
 					_placing = null;
 
 					ExitPlacementMode ();
 				}
 
-			} else if (GameManager.gamePhase == GamePhase.Raid) {
+			} else if (GameManager.instance.gamePhase == GamePhase.Raid) {
 				if (_mouseOver != null) {
 					_mouseOver.OnTrigger ();
 				}
@@ -234,13 +234,13 @@ public class CameraController : MonoBehaviour {
 	public void Place (GameObject prefab) {
 		if (_placing != null) Destroy (_placing.gameObject);
 
-		if (GameManager.gamePhase != GamePhase.Setup || !_zoomedIn) return;
+		if (GameManager.instance.gamePhase != GamePhase.Setup || !_zoomedIn) return;
 
 		GameObject instance = GameObject.Instantiate (prefab);
 		_placing = instance.GetComponent<Placeable> ();
 		instance.SetActive (false);
 
-		if (GameManager.cash >= _placing.cost) {
+		if (GameManager.instance.cash >= _placing.cost) {
 			EnterPlacementMode ();
 
 		} else {

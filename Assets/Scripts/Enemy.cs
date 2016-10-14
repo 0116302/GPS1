@@ -99,36 +99,9 @@ public class Enemy : Destructible {
 		}
 	}
 
-//	void OnCollisionEnter (Collision collision) {
-//		if (collision.gameObject.CompareTag("Door")) {
-//			if ((collision.transform.position.x < transform.position.x && walkDirection == WalkDirection.Left) || (collision.transform.position.x > transform.position.x && walkDirection == WalkDirection.Right)) {
-//				StartCoroutine (TryOpenDoor ());
-//			}
-//		}
-//	}
-//
-//	private IEnumerator TryOpenDoor () {
-//		walkDirection = WalkDirection.None;
-//		animator.SetFloat ("MovementSpeed", 0.0f);
-//		animator.SetBool ("TryingToOpenDoor", true);
-//		progressingState.DoNotRepeat ();
-//
-//		yield return new WaitForSeconds (2.0f);
-//
-//		animator.SetBool ("TryingToOpenDoor", false);
-//		progressingState.DetermineTarget ();
-//	}
-
 	void OnDeath () {
 		Rigidbody decapitatedHead = ((GameObject) GameObject.Instantiate (decapitatedHeadPrefab, head.transform.position, head.transform.rotation)).GetComponent<Rigidbody> ();
 		decapitatedHead.AddForce (new Vector3(-0.5f, 2f, 0f), ForceMode.Impulse);
-
-		GameManager.enemyCount--;
-		if (GameManager.enemyCount == 0) {
-			// Win
-			GameObject.FindObjectOfType<GUIManager> ().Win ();
-
-		}
 
 		Destroy (gameObject);
 	}

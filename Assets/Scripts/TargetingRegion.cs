@@ -12,8 +12,11 @@ public class TargetingRegion : MonoBehaviour {
 	}
 
 	void OnTriggerStay (Collider other) {
-		if (_targeter != null && other.CompareTag(targetTag) && _targeter.target == null) {
-			_targeter.SetTarget (other.transform);
+		if (_targeter != null && other.CompareTag(targetTag)) {
+			// Change target if targeter is currently idle or new target is closer
+			if (_targeter.target == null || (targeterObject.transform.position - other.transform.position).sqrMagnitude < (targeterObject.transform.position - _targeter.target.position).sqrMagnitude) {
+				_targeter.SetTarget (other.transform);
+			}
 		}
 	}
 
