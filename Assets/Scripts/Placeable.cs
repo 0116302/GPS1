@@ -1,21 +1,42 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Placeable : MonoBehaviour, IPlaceable {
+public class Placeable : MonoBehaviour {
 
+	[Header ("Gameplay Settings")]
 	public int cost = 1000;
+	public bool removable = true;
+	public bool refundable = true;
 
+	[Header ("Placement Parameters")]
 	public uint width = 1;
 	public uint height = 1;
 
+	[Space (10)]
 	public uint horizontalSnap = 1;
 	public uint verticalSnap = 1;
-	public Vector3 offset = new Vector3 (0.5f, -0.5f, -0.0001f);
 
-	public bool placeMidAir = true;
-	public bool placeOnFloor = true;
-	public bool placeOnCeiling = true;
-	public bool placeOnWalls = true;
+	[Space (10)]
+	public SpriteRenderer highlight;
+	public Color positiveHighlight = new Color (0.0f, 1.0f, 0.0f);
+	public Color negativeHighlight = new Color (1.0f, 0.0f, 0.0f);
+	public float transitionDuration = 0.1f;
+	private Coroutine transition = null;
+
+	[Space (10)]
+	public Vector3 placementOffset = new Vector3 (0.5f, -0.5f, -0.0001f);
+
+	[Space (10)]
+	public bool placeableInMidAir = true;
+	public bool placeableOnFloors = true;
+	public bool placeableOnCeilings = true;
+	public bool placeableOnWalls = true;
+
+	private bool _placed = false;
+	public bool placed {
+		get { return _placed; }
+		set { _placed = value; }
+	}
 
 	private Transform placementGrid;
 	private int _conflictCount = 0;
@@ -28,8 +49,8 @@ public class Placeable : MonoBehaviour, IPlaceable {
 		get { return verticalSnap; }
 	}
 
-	public Vector3 placementOffset {
-		get { return offset; }
+	void OnEnable () {
+		_conflictCount = 0;
 	}
 
 	public virtual bool CanBePlacedHere (int x, int y, int gridWidth, int gridHeight) {
@@ -39,15 +60,18 @@ public class Placeable : MonoBehaviour, IPlaceable {
 				// X = Left
 				if (y == 0) {
 					// Y = Ceiling
-					if (placeOnWalls || placeOnCeiling) return true;
+					if (placeableOnWalls || placeableOnCeilings)
+						return true;
 
 				} else if (y < 0 && y > -(gridHeight - height)) {
 					// Y = Middle
-					if (placeOnWalls) return true;
+					if (placeableOnWalls)
+						return true;
 
 				} else if (y == -(gridHeight - height)) {
 					// Y = Floor
-					if (placeOnWalls || placeOnFloor) return true;
+					if (placeableOnWalls || placeableOnFloors)
+						return true;
 				}
 
 
@@ -55,15 +79,18 @@ public class Placeable : MonoBehaviour, IPlaceable {
 				// X = Middle
 				if (y == 0) {
 					// Y = Ceiling
-					if (placeOnCeiling) return true;
+					if (placeableOnCeilings)
+						return true;
 
 				} else if (y < 0 && y > -(gridHeight - height)) {
 					// Y = Middle
-					if (placeMidAir) return true;
+					if (placeableInMidAir)
+						return true;
 
 				} else if (y == -(gridHeight - height)) {
 					// Y = Floor
-					if (placeOnFloor) return true;
+					if (placeableOnFloors)
+						return true;
 				}
 
 
@@ -71,15 +98,18 @@ public class Placeable : MonoBehaviour, IPlaceable {
 				// X = Right
 				if (y == 0) {
 					// Y = Ceiling
-					if (placeOnWalls || placeOnCeiling) return true;
+					if (placeableOnWalls || placeableOnCeilings)
+						return true;
 
 				} else if (y < 0 && y > -(gridHeight - height)) {
 					// Y = Middle
-					if (placeOnWalls) return true;
+					if (placeableOnWalls)
+						return true;
 
 				} else if (y == -(gridHeight - height)) {
 					// Y = Floor
-					if (placeOnWalls || placeOnFloor) return true;
+					if (placeableOnWalls || placeableOnFloors)
+						return true;
 				}
 			}
 		}
@@ -91,12 +121,53 @@ public class Placeable : MonoBehaviour, IPlaceable {
 		// Do nothing by default
 	}
 
+	public virtual void OnRemove () {
+		// Do nothing by default
+	}
+
 	void OnTriggerEnter (Collider other) {
-		Debug.Log ("Conflict with " + other.gameObject.name);
 		_conflictCount++;
 	}
 
 	void OnTriggerExit (Collider other) {
+		//TODO This doesn't always fully cancel out the conflicts!
 		_conflictCount--;
+	}
+
+	public void HighlightPositive () {
+		if (transition != null) StopCoroutine (transition);
+
+		if (highlight.color != positiveHighlight)
+			transition = StartCoroutine (ChangeHighlightColor (highlight.color, positiveHighlight, transitionDuration));
+	}
+
+	public void HighlightNegative () {
+		if (transition != null) StopCoroutine (transition);
+
+		if (highlight.color != negativeHighlight)
+			transition = StartCoroutine (ChangeHighlightColor (highlight.color, negativeHighlight, transitionDuration));
+	}
+
+	public void HideHighlight () {
+		if (transition != null) StopCoroutine (transition);
+
+		Color hidden = new Color (0.0f, 0.0f, 0.0f, 0.0f);
+		if (highlight.color != hidden)
+			transition = StartCoroutine (ChangeHighlightColor (highlight.color, hidden, transitionDuration));
+	}
+
+	IEnumerator ChangeHighlightColor (Color sourceColor, Color destinationColor, float duration) {
+		float elapsedTime = 0.0f;
+		YieldInstruction waitForEndOfFrame = new WaitForEndOfFrame ();
+
+		while (elapsedTime < duration) {
+			highlight.color = Color.Lerp (sourceColor, destinationColor, (elapsedTime / duration));
+
+			elapsedTime += Time.deltaTime;
+			yield return waitForEndOfFrame;
+		}
+		highlight.color = destinationColor;
+
+		yield break;
 	}
 }

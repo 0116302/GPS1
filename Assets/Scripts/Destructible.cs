@@ -2,6 +2,13 @@
 using UnityEngine.Events;
 using System.Collections;
 
+public enum DamageType {
+	Generic = 0,
+	Impact,
+	Heat,
+	Cold
+}
+
 public class Destructible : MonoBehaviour {
 
 	[Header("Health")]
@@ -10,12 +17,12 @@ public class Destructible : MonoBehaviour {
 
 	public UnityEvent onDeath = new UnityEvent ();
 
-	public void Damage (float amount) {
+	public virtual void Damage (float amount, DamageType type = DamageType.Generic) {
 		health = Mathf.Clamp (health - amount, 0, maximumHealth);
 		if (health <= 0f) onDeath.Invoke ();
 	}
 
-	public void Heal (float amount) {
+	public virtual void Heal (float amount) {
 		health = Mathf.Clamp (health + amount, 0, maximumHealth);
 		if (health <= 0f) onDeath.Invoke ();
 	}

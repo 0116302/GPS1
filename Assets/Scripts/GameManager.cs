@@ -20,21 +20,49 @@ public class GameManager : MonoBehaviour {
 		}
 	}
 
-	public GamePhase gamePhase = GamePhase.Setup;
-	public int enemyCount = 0;
-	public int killsToWin = 0;
-	public int cash = 10000;
+	private GamePhase _gamePhase = GamePhase.Setup;
+	public GamePhase gamePhase {
+		get {
+			return _gamePhase;
+		}
+	}
+
+	[Header("Level Setup")]
+	public TimedSpawner enemySpawner;
+	public int enemyCount = 10;
+	public int startingCash = 10000;
+
+	[HideInInspector]
+	public int enemiesLeft;
+	[HideInInspector]
+	public int cash;
 
 	void Awake () {
 		if (_instance == null)
 			_instance = this;
 		else if (instance != this)
-			Destroy(gameObject);    
+			Destroy(gameObject);
 
-		DontDestroyOnLoad(gameObject);
+		Initialize ();
 	}
 
 	public void Initialize () {
+		enemiesLeft = enemyCount;
+		cash = startingCash;
+	}
 
+	public void StartRaid () {
+		_gamePhase = GamePhase.Raid;
+		enemySpawner.enabled = true;
+
+		//TODO Force exit placement mode and into activation mode
+	}
+
+	public void Lose () {
+		_gamePhase = GamePhase.Lose;
+	}
+
+	public void Win () {
+		_gamePhase = GamePhase.Win;
 	}
 }

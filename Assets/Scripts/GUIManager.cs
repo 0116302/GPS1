@@ -26,6 +26,8 @@ public class GUIManager : MonoBehaviour {
 			_instance = this;
 		else if (instance != this)
 			Destroy(gameObject);
+
+		DontDestroyOnLoad(gameObject);
 	}
 	
 	// Update is called once per frame
@@ -34,9 +36,13 @@ public class GUIManager : MonoBehaviour {
 		enemyCountDisplay.text = "Enemies: " + GameManager.instance.enemyCount;
 	}
 
+	// Update the GUI to match the room we are in
+	public void SwitchToRoom () {
+
+	}
+
 	public void StartRaid () {
-		GameManager.instance.gamePhase = GamePhase.Raid;
-		GameObject.Find ("EnemySpawner").GetComponent<TimedSpawner> ().enabled = true;
+		GameManager.instance.StartRaid ();
 		trapToolbar.gameObject.SetActive(false);
 	}
 

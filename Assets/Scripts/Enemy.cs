@@ -6,7 +6,8 @@ public class Enemy : Destructible {
 
 	public TextMesh healthDisplay; // TEMPORARY
 
-	[HideInInspector] public Animator animator;
+	[HideInInspector]
+	public Animator animator;
 
 	public enum WalkDirection
 	{
@@ -15,13 +16,32 @@ public class Enemy : Destructible {
 		Right = 1
 	}
 
-	[Header("Movement")]
+	[Header ("Movement")]
 	public bool canMove = true;
 	public float walkSpeed = 1.0f;
 	public WalkDirection walkDirection = WalkDirection.Right;
 
-	[Header("Death")]
-	public Transform head;
+	[Header ("Parts")]
+	public SpriteRenderer head;
+	public SpriteRenderer torso;
+	public SpriteRenderer leftArm;
+	public SpriteRenderer leftForearm;
+	public SpriteRenderer leftHand;
+	public SpriteRenderer leftHandItem;
+	public SpriteRenderer rightArm;
+	public SpriteRenderer rightForearm;
+	public SpriteRenderer rightHand;
+	public SpriteRenderer rightHandItem;
+	public SpriteRenderer pelvis;
+	public SpriteRenderer leftThigh;
+	public SpriteRenderer leftLeg;
+	public SpriteRenderer leftFoot;
+	public SpriteRenderer rightThigh;
+	public SpriteRenderer rightLeg;
+	public SpriteRenderer rightFoot;
+	public SpriteRenderer tail;
+
+	[Header ("Death")]
 	public GameObject decapitatedHeadPrefab;
 
 	private Room _currentRoom;

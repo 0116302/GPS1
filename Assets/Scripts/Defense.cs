@@ -3,19 +3,21 @@ using System.Collections;
 
 public abstract class Defense : MonoBehaviour, ITriggerable {
 
-	public virtual void OnHoverEnter() {
+	public Placeable placeableParent;
+
+	public virtual void OnHoverEnter () {
 
 	}
 
-	public virtual void OnHoverStay() {
+	public virtual void OnHoverStay () {
 
 	}
 
-	public virtual void OnHoverExit() {
+	public virtual void OnHoverExit () {
 
 	}
 
-	public virtual void OnTrigger() {
+	public virtual void OnTrigger () {
 		
 	}
 }
