@@ -13,13 +13,15 @@ public class GUIManager : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-	
 	}
 	
 	// Update is called once per frame
 	void Update () {
 		cashDisplay.text = "$" + GameManager.cash;
 		enemyCountDisplay.text = "Enemies: " + GameManager.enemyCount;
+
+		TempStart();
+		TempRestart();
 	}
 
 	public void StartRaid () {
@@ -44,5 +46,27 @@ public class GUIManager : MonoBehaviour {
 		GameManager.cash = 10000;
 
 		SceneManager.LoadScene ("GameScene");
+	}
+
+	public void TempStart ()
+	{
+		if (Input.GetKeyDown(KeyCode.Return))
+		{
+		GameManager.gamePhase = GamePhase.Raid;
+		GameObject.Find ("EnemySpawner").GetComponent<TimedSpawner> ().enabled = true;
+		trapToolbar.gameObject.SetActive(false);
+		}
+	}
+
+	public void TempRestart ()
+	{
+		if (Input.GetKeyDown(KeyCode.R))
+		{
+			GameManager.gamePhase = GamePhase.Setup;
+			GameManager.enemyCount = 10;
+			GameManager.cash = 10000;
+
+			SceneManager.LoadScene ("GameScene");
+		}
 	}
 }

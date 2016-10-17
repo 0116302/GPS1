@@ -8,14 +8,18 @@ public class TimedSpawner : MonoBehaviour {
 	public List<float> spawnTimes = new List<float> ();
 
 	private float elapsedTime = 0.0f;
-	
-	// Update is called once per frame
+
 	void Update () {
-		elapsedTime += Time.deltaTime;
-		if (spawnTimes.Count >= 1 && elapsedTime >= spawnTimes[0]) {
+//		elapsedTime += Time.deltaTime;
+//		if (spawnTimes.Count >= 1 && elapsedTime >= spawnTimes[0]) {
+//			GameObject.Instantiate (prefab, transform.position, transform.rotation);
+//			spawnTimes.RemoveAt (0);
+//			elapsedTime = 0.0f;
+//		}
+
+		if (Input.GetKeyDown(KeyCode.Q))
+		{
 			GameObject.Instantiate (prefab, transform.position, transform.rotation);
-			spawnTimes.RemoveAt (0);
-			elapsedTime = 0.0f;
 		}
 	}
 }
