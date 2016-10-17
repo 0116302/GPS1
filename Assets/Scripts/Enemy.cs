@@ -16,6 +16,7 @@ public class Enemy : Destructible {
 	}
 
 	[Header("Movement")]
+	public bool canMove = true;
 	public float walkSpeed = 1.0f;
 	public WalkDirection walkDirection = WalkDirection.Right;
 
@@ -67,7 +68,7 @@ public class Enemy : Destructible {
 			transform.localScale = newScale;
 		}
 
-		if (walkDirection != WalkDirection.None) {
+		if (walkDirection != WalkDirection.None && canMove) {
 			animator.SetFloat ("MovementSpeed", walkSpeed);
 		} else {
 			animator.SetFloat ("MovementSpeed", 0.0f);
@@ -79,7 +80,7 @@ public class Enemy : Destructible {
 	}
 
 	void FixedUpdate () {
-		if (walkDirection != WalkDirection.None) {
+		if (walkDirection != WalkDirection.None && canMove) {
 			transform.Translate (new Vector3(walkSpeed * Time.deltaTime, 0.0f, 0.0f));
 		}
 	}
@@ -91,9 +92,9 @@ public class Enemy : Destructible {
 				_currentRoom = other.GetComponent<Room> ();
 				//Debug.Log ("Enemy has entered " + _currentRoom.roomName);
 
-//				if (_currentRoom.roomName == "Control Room") {
-//					GameObject.FindObjectOfType<GUIManager> ().Lose ();
-//				}
+				if (_currentRoom.roomName == "Control Room") {
+					GameObject.FindObjectOfType<GUIManager> ().Lose ();
+				}
 			}
 		}
 	}
@@ -122,12 +123,12 @@ public class Enemy : Destructible {
 		Rigidbody decapitatedHead = ((GameObject) GameObject.Instantiate (decapitatedHeadPrefab, head.transform.position, head.transform.rotation)).GetComponent<Rigidbody> ();
 		decapitatedHead.AddForce (new Vector3(-0.5f, 2f, 0f), ForceMode.Impulse);
 
-//		GameManager.enemyCount--;
-//		if (GameManager.enemyCount == 0) {
-//			// Win
-//			GameObject.FindObjectOfType<GUIManager> ().Win ();
-//
-//		}
+		GameManager.enemyCount--;
+		if (GameManager.enemyCount == 0) {
+			// Win
+			GameObject.FindObjectOfType<GUIManager> ().Win ();
+
+		}
 
 		Destroy (gameObject);
 	}

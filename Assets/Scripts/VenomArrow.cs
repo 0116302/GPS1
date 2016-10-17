@@ -9,6 +9,7 @@ public class VenomArrow : MonoBehaviour
 	public float intervalDuration;
 
 	float amountDamaged = 0.0f;
+	float lifetime = 21.0f;
 
 	void Update ()
 	{
@@ -18,20 +19,20 @@ public class VenomArrow : MonoBehaviour
 
 	IEnumerator DamageOverTimeCoroutine (Collision collision)
 	{
-		yield return new WaitForSeconds(intervalDuration);
-
 		Destructible hit = collision.gameObject.GetComponent<Destructible> ();
 		while (hit != null && amountDamaged < totalDamage)
 		{
+			yield return new WaitForSeconds(intervalDuration);
 			hit.Damage (damage);
 			amountDamaged++;
-			yield return new WaitForSeconds(intervalDuration);
 		}
 	}
 
 	void OnCollisionEnter (Collision collision)
 	{
 		StartCoroutine (DamageOverTimeCoroutine(collision));
-		Destroy(gameObject);
+		Destroy(GetComponent<SpriteRenderer>());
+		Destroy(GetComponent<SphereCollider>());
+		Destroy(gameObject, lifetime);
 	}
 }

@@ -20,13 +20,12 @@ public class MiniRocket : MonoBehaviour, ITargeter
 	{
 		if (_target != null)
 		{
-			Debug.Log ("Target Spotted.");
 			transform.position += (_target.position - transform.position).normalized * speed * Time.deltaTime;
 
-			Vector3 direction = transform.position - _target.position;
-			float angle = Mathf.Atan2 (direction.y, direction.x) * Mathf.Rad2Deg;
-
-			transform.rotation = Quaternion.Lerp (transform.rotation, Quaternion.Euler (0f, 0f, angle - 90f), 10f * Time.deltaTime);
+//			Vector3 direction = transform.position - _target.position;
+//			float angle = Mathf.Atan2 (direction.y, direction.x) * Mathf.Rad2Deg;
+//
+//			transform.rotation = Quaternion.Lerp (transform.rotation, Quaternion.Euler (0f, 0f, angle), 10f * Time.deltaTime);
 
 			ParticleSystem effect = rocketSmoke.GetComponent<ParticleSystem> ();
 			if (effect != null) effect.Play ();

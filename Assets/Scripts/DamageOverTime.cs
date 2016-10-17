@@ -23,13 +23,13 @@ public class DamageOverTime : MonoBehaviour
 			hit.Damage (damage);
 			amountDamaged++;
 			yield return new WaitForSeconds(intervalDuration);
-			// Physics.IgnoreCollision(collision.collider, GetComponent<Collider>());
 		}
 	}
 
 	void OnTriggerEnter (Collider collision)
 	{
 		StartCoroutine (DamageOverTimeCoroutine(collision));
+		// Physics.IgnoreCollision(collision.GetComponent<Collider>(), GetComponent<Collider>());
 	}
 
 	// void OnTriggerStay - Reset amountDamaged

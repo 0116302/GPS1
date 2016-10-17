@@ -18,5 +18,6 @@ public class ElectricDamage : MonoBehaviour
 		{
 			hit.Damage (damage);
 		}
+		// Physics.IgnoreCollision(collision.GetComponent<Collider>(), GetComponent<Collider>());
 	}
 }
