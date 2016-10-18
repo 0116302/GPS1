@@ -72,7 +72,7 @@ public class Enemy : Destructible {
 
 	// Use this for initialization
 	void Start () {
-		onDeath.AddListener (OnDeath);
+		onDestroyed.AddListener (OnDeath);
 
 		currentState = progressingState;
 	}
@@ -113,7 +113,7 @@ public class Enemy : Destructible {
 				//Debug.Log ("Enemy has entered " + _currentRoom.roomName);
 
 				if (_currentRoom.roomName == "Control Room") {
-					GameObject.FindObjectOfType<GUIManager> ().Lose ();
+					GUIManager.instance.Lose ();
 				}
 			}
 		}
@@ -122,6 +122,11 @@ public class Enemy : Destructible {
 	void OnDeath () {
 		Rigidbody decapitatedHead = ((GameObject) GameObject.Instantiate (decapitatedHeadPrefab, head.transform.position, head.transform.rotation)).GetComponent<Rigidbody> ();
 		decapitatedHead.AddForce (new Vector3(-0.5f, 2f, 0f), ForceMode.Impulse);
+
+		GameManager.instance.enemiesLeft--;
+		if (GameManager.instance.enemiesLeft == 0) {
+			GUIManager.instance.Win ();
+		}
 
 		Destroy (gameObject);
 	}

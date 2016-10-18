@@ -13,19 +13,16 @@ public class Door : MonoBehaviour, ITriggerable {
 		get { return _isOpen; }
 	}
 
+	public CooldownIndicator cooldownIndicator;
 	private float cooldown = 0.0f;
 	public float closeDuration = 10.0f;
 	public float cooldownDuration = 30.0f;
 
 	Animator animator;
 
-	GUIManager guiManager;
-
-	void Start () {
+	void Awake () {
 		animator = GetComponent<Animator> ();
 		animator.SetBool ("altDirection", altDirection);
-
-		guiManager = GameObject.FindObjectOfType<GUIManager> ();
 
 		if (openByDefault) Open ();
 	}
@@ -34,30 +31,33 @@ public class Door : MonoBehaviour, ITriggerable {
 		if (cooldown > 0.0f) {
 			cooldown -= Time.deltaTime;
 
+			if (cooldownIndicator != null) {
+				cooldownIndicator.cooldownValue = cooldown / cooldownDuration;
+			}
+
 			if (cooldown <= cooldownDuration - closeDuration) {
 				Open ();
 			}
 
 		} else {
 			cooldown = 0.0f;
+
+			if (cooldownIndicator != null) {
+				cooldownIndicator.cooldownValue = 0.0f;
+			}
 		}
 	}
 
 	public void OnHoverEnter () {
-		
+
 	}
 
 	public void OnHoverStay () {
-		if (cooldown > 0.0f) {
-			guiManager.cooldownDisplay.text = "Cooldown: " + Mathf.CeilToInt (cooldown) + "s";
 
-		} else {
-			guiManager.cooldownDisplay.text = "";
-		}
 	}
 
 	public void OnHoverExit () {
-		guiManager.cooldownDisplay.text = "";
+
 	}
 
 	public void OnTrigger () {

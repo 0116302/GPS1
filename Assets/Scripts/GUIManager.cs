@@ -16,9 +16,9 @@ public class GUIManager : MonoBehaviour {
 	}
 
 	public Transform trapToolbar;
+	public Text roomNameDisplay;
 	public Text cashDisplay;
 	public Text enemyCountDisplay;
-	public Text cooldownDisplay;
 	public Text winLoseDisplay;
 
 	void Awake () {
@@ -26,19 +26,21 @@ public class GUIManager : MonoBehaviour {
 			_instance = this;
 		else if (instance != this)
 			Destroy(gameObject);
-
-		DontDestroyOnLoad(gameObject);
 	}
 	
 	// Update is called once per frame
 	void Update () {
 		cashDisplay.text = "$" + GameManager.instance.cash;
-		enemyCountDisplay.text = "Enemies: " + GameManager.instance.enemyCount;
+		enemyCountDisplay.text = "Enemies: " + GameManager.instance.enemiesLeft;
 	}
 
 	// Update the GUI to match the room we are in
-	public void SwitchToRoom () {
+	public void SwitchToRoom (Room room) {
+		roomNameDisplay.text = room.roomName;
+	}
 
+	public void SwitchToOverview () {
+		roomNameDisplay.text = "";
 	}
 
 	public void StartRaid () {

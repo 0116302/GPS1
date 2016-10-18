@@ -27,7 +27,10 @@ public class GameManager : MonoBehaviour {
 		}
 	}
 
-	[Header("Level Setup")]
+	public PlayerController player;
+	[Space (10)]
+
+	[Header ("Level Setup")]
 	public TimedSpawner enemySpawner;
 	public int enemyCount = 10;
 	public int startingCash = 10000;
@@ -53,9 +56,8 @@ public class GameManager : MonoBehaviour {
 
 	public void StartRaid () {
 		_gamePhase = GamePhase.Raid;
+		if (player != null) player.EnterActivationMode ();
 		enemySpawner.enabled = true;
-
-		//TODO Force exit placement mode and into activation mode
 	}
 
 	public void Lose () {

@@ -20,6 +20,8 @@ public class PlayerController : MonoBehaviour {
 	public Transform overviewPosition;
 	public float overviewFOV = 25.0f;
 
+	private Coroutine cameraTransition;
+
 	private Room _currentRoom;
 	public Room currentRoom {
 		get { return _currentRoom; }
@@ -151,9 +153,16 @@ public class PlayerController : MonoBehaviour {
 				
 				layerMask = 1 << LayerMask.NameToLayer ("Grid Objects");
 				if (Physics.Raycast (ray, out hit, raycastDistance, layerMask, QueryTriggerInteraction.Collide)) {
-					if ((_selected = hit.collider.GetComponent<Placeable> ()) != null) {
 
-						if (_selected.removable) {
+					Placeable placeable = hit.collider.GetComponent<Placeable> ();
+					if (placeable != null) {
+
+						if (_selected != placeable) {
+							if (_selected != null) {
+								_selected.HideHighlight ();
+							}
+
+							_selected = placeable;
 							_selected.HighlightNegative ();
 						}
 
@@ -174,7 +183,6 @@ public class PlayerController : MonoBehaviour {
 						_selected.OnRemove ();
 
 						Destroy (_selected.gameObject);
-						_selected = null;
 
 						EnterObservationMode ();
 					}
@@ -187,6 +195,7 @@ public class PlayerController : MonoBehaviour {
 					
 					ITriggerable triggerable = hit.collider.GetComponent<ITriggerable> ();
 					if (triggerable != null) {
+						
 						if (_mouseOver != triggerable) {
 							if (_mouseOver != null)
 								_mouseOver.OnHoverExit ();
@@ -197,6 +206,7 @@ public class PlayerController : MonoBehaviour {
 						} else {
 							_mouseOver.OnHoverStay ();
 						}
+
 					}
 
 				} else {
@@ -219,10 +229,12 @@ public class PlayerController : MonoBehaviour {
 
 	public void SwitchToRoomView (Room room) {
 		if (_cameraMode == CameraMode.Overview) {
-			StartCoroutine (MoveCamera (room.cameraPosition.position, room.cameraFOV, cameraZoomDuration));
+			if (cameraTransition != null) StopCoroutine (cameraTransition);
+			cameraTransition = StartCoroutine (MoveCamera (room.cameraPosition.position, room.cameraFOV, cameraZoomDuration));
 
 		} else {
-			StartCoroutine (MoveCamera (room.cameraPosition.position, room.cameraFOV, cameraSwitchDuration));
+			if (cameraTransition != null) StopCoroutine (cameraTransition);
+			cameraTransition = StartCoroutine (MoveCamera (room.cameraPosition.position, room.cameraFOV, cameraSwitchDuration));
 
 			if (_playerMode == PlayerMode.Placement || _playerMode == PlayerMode.Removal) {
 				if (room.canPlaceDefenses) {
@@ -235,6 +247,8 @@ public class PlayerController : MonoBehaviour {
 			}
 		}
 
+		GUIManager.instance.SwitchToRoom (room);
+
 		_currentRoom = room;
 		_placementOrigin = _currentRoom.placementGrid.position - new Vector3 (_currentRoom.placementGrid.localScale.x / 2f, _currentRoom.placementGrid.localScale.y / -2f, 0f);
 		_gridWidth = Mathf.FloorToInt (_currentRoom.placementGrid.localScale.x);
@@ -243,8 +257,11 @@ public class PlayerController : MonoBehaviour {
 	}
 
 	public void SwitchToOverview () {
-		EnterObservationMode ();
-		StartCoroutine (MoveCamera (overviewPosition.position, overviewFOV, cameraZoomDuration));
+		if (_playerMode == PlayerMode.Placement || _playerMode == PlayerMode.Removal) EnterObservationMode ();
+		if (cameraTransition != null) StopCoroutine (cameraTransition);
+		cameraTransition = StartCoroutine (MoveCamera (overviewPosition.position, overviewFOV, cameraZoomDuration));
+
+		GUIManager.instance.SwitchToOverview ();
 
 		_currentRoom = null;
 		_cameraMode = CameraMode.Overview;
@@ -254,7 +271,6 @@ public class PlayerController : MonoBehaviour {
 		if (_playerMode == PlayerMode.Placement || _playerMode == PlayerMode.Removal) _currentRoom.fadeOutGrid (gridFadeDuration);
 		if (_selected != null) {
 			Destroy (_selected.gameObject);
-			_selected = null;
 		}
 
 		_playerMode = PlayerMode.Observation;
@@ -267,7 +283,6 @@ public class PlayerController : MonoBehaviour {
 
 		if (_selected != null) {
 			Destroy (_selected.gameObject);
-			_selected = null;
 		}
 
 		Placeable template;
@@ -290,7 +305,6 @@ public class PlayerController : MonoBehaviour {
 		if (_playerMode != PlayerMode.Placement && _playerMode != PlayerMode.Removal) _currentRoom.fadeInGrid (gridFadeDuration);
 		if (_selected != null) {
 			Destroy (_selected.gameObject);
-			_selected = null;
 		}
 
 		_playerMode = PlayerMode.Removal;
@@ -300,7 +314,6 @@ public class PlayerController : MonoBehaviour {
 		if (_playerMode == PlayerMode.Placement || _playerMode == PlayerMode.Removal) _currentRoom.fadeOutGrid (gridFadeDuration);
 		if (_selected != null) {
 			Destroy (_selected.gameObject);
-			_selected = null;
 		}
 
 		_playerMode = PlayerMode.Activation;

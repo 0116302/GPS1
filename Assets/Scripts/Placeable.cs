@@ -20,7 +20,7 @@ public class Placeable : MonoBehaviour {
 	public SpriteRenderer highlight;
 	public Color positiveHighlight = new Color (0.0f, 1.0f, 0.0f);
 	public Color negativeHighlight = new Color (1.0f, 0.0f, 0.0f);
-	public float transitionDuration = 0.1f;
+	public float transitionDuration = 0.2f;
 	private Coroutine transition = null;
 
 	[Space (10)]

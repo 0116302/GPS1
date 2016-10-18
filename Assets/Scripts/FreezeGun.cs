@@ -19,18 +19,19 @@ public class FreezeGun : Defense, ITargeter {
 	private Enemy _hitEnemy;
 
 	public float stunDuration = 5.0f;
+
+	public CooldownIndicator cooldownIndicator;
 	private float cooldown = 0.0f;
 	public float cooldownDuration = 15.0f;
 
-	GUIManager guiManager;
-
 	void Awake () {
-		guiManager = GameObject.FindObjectOfType<GUIManager> ();
 		lineRenderer = GetComponent<LineRenderer> ();
 	}
 
 	// Update is called once per frame
 	void Update () {
+		if (placeableParent != null && !placeableParent.placed) return;
+
 		if (!_isShooting) {
 			if (_target != null) {
 				Vector3 direction = transform.position - _target.position;
@@ -51,30 +52,21 @@ public class FreezeGun : Defense, ITargeter {
 		if (cooldown > 0.0f) {
 			cooldown -= Time.deltaTime;
 
+			if (cooldownIndicator != null) {
+				cooldownIndicator.cooldownValue = cooldown / cooldownDuration;
+			}
+
 		} else {
 			cooldown = 0.0f;
+
+			if (cooldownIndicator != null) {
+				cooldownIndicator.cooldownValue = 0.0f;
+			}
 		}
 	}
 
 	public void SetTarget (Transform target) {
 		_target = target;
-	}
-
-	public override void OnHoverEnter () {
-
-	}
-
-	public override void OnHoverStay () {
-		if (cooldown > 0.0f) {
-			guiManager.cooldownDisplay.text = "Cooldown: " + Mathf.CeilToInt (cooldown) + "s";
-
-		} else {
-			guiManager.cooldownDisplay.text = "";
-		}
-	}
-
-	public override void OnHoverExit () {
-		guiManager.cooldownDisplay.text = "";
 	}
 
 	public override void OnTrigger () {
@@ -87,7 +79,7 @@ public class FreezeGun : Defense, ITargeter {
 
 	IEnumerator Fire () {
 		RaycastHit hit;
-		int layerMask = 1 | (1 << 10) | (1 << 11);
+		int layerMask = (1 << LayerMask.NameToLayer ("Rooms")) | (1 << LayerMask.NameToLayer ("Room Walls")) | (1 << LayerMask.NameToLayer ("Enemies"));
 
 		if (Physics.Raycast (laserOrigin.position, -laserOrigin.up, out hit, laserDistance, layerMask, QueryTriggerInteraction.Ignore)) {
 			_isShooting = true;
