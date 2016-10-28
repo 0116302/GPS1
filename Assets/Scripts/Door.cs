@@ -4,7 +4,7 @@ using System.Collections;
 [RequireComponent(typeof(Animator))]
 public class Door : MonoBehaviour, ITriggerable {
 
-	public bool altDirection = false;
+	public bool alternateDirection = false;
 	public bool openByDefault = true;
 	public bool playerControlled = true;
 
@@ -13,16 +13,23 @@ public class Door : MonoBehaviour, ITriggerable {
 		get { return _isOpen; }
 	}
 
+	[Header ("Cooldown")]
 	public CooldownIndicator cooldownIndicator;
 	private float cooldown = 0.0f;
 	public float closeDuration = 10.0f;
 	public float cooldownDuration = 30.0f;
 
+	[Header ("Staircase")]
+	public bool isStaircase = false;
+	public Room room;
+	public Transform teleportPosition;
+	public Door destination;
+
 	Animator animator;
 
 	void Awake () {
 		animator = GetComponent<Animator> ();
-		animator.SetBool ("altDirection", altDirection);
+		animator.SetBool ("altDirection", alternateDirection);
 
 		if (openByDefault) Open ();
 	}

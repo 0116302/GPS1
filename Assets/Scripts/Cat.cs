@@ -3,6 +3,8 @@ using System.Collections;
 
 public class Cat : Destructible {
 
+	public float walkingSpeed = 1.0f;
+
 	[HideInInspector]
 	public Animator animator;
 
@@ -37,25 +39,29 @@ public class Cat : Destructible {
 	void Awake () {
 		animator = GetComponent<Animator> ();
 
-		//TODO Solve sorting issue
+		// Randomize position on the Z axis to prevent overlapping with parts of other cats
+		//TODO Improve this to reduce overlap even more
+		Vector3 newPos = transform.position;
+		newPos.z = 0.02f * Random.Range (-5, 5);
+		transform.position = newPos;
 
 		AssignStates ();
 	}
 
 	protected virtual void AssignStates () {
-		
+		progressingState = new CatDefaultProgressingState (this);
+		exploringState = new CatDefaultExploringState (this);
+		currentState = progressingState;
 	}
+
+	// Event propagating
 
 	void Start () {
 		progressingState.Start ();
 		exploringState.Start ();
-		panickingState.Start ();
-		luredState.Start ();
-
-		currentState = progressingState;
+		//panickingState.Start ();
+		//luredState.Start ();
 	}
-	
-	// Event propagating
 
 	void Update () {
 		currentState.Update ();
@@ -69,7 +75,23 @@ public class Cat : Destructible {
 		currentState.OnCollisionEnter (collision);
 	}
 
+	void OnCollisionStay (Collision collision) {
+		currentState.OnCollisionStay (collision);
+	}
+
 	void OnCollisionExit (Collision collision) {
 		currentState.OnCollisionExit (collision);
+	}
+
+	void OnTriggerEnter (Collider collider) {
+		currentState.OnTriggerEnter (collider);
+	}
+
+	void OnTriggerStay (Collider collider) {
+		currentState.OnTriggerStay (collider);
+	}
+
+	void OnTriggerExit (Collider collider) {
+		currentState.OnTriggerExit (collider);
 	}
 }

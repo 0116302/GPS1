@@ -6,6 +6,7 @@ public class Room : MonoBehaviour {
 
 	[Header ("Room Setup")]
 	public string roomName = "Room";
+	public float roomWidth = 5.0f;
 	public Transform cameraPosition;
 	public Transform placementGrid;
 
@@ -21,7 +22,7 @@ public class Room : MonoBehaviour {
 	[Header ("Paths")]
 	public Door leftDoor;
 	public Door rightDoor;
-	public List<Staircase> staircases;
+	public List<Door> staircases;
 
 	[Header ("Camera Settings")]
 	public float cameraFOV = 12.0f;

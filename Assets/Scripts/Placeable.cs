@@ -130,7 +130,6 @@ public class Placeable : MonoBehaviour {
 	}
 
 	void OnTriggerExit (Collider other) {
-		//TODO This doesn't always fully cancel out the conflicts!
 		_conflictCount--;
 	}
 

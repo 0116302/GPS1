@@ -27,7 +27,23 @@ public abstract class CatState {
 
 	}
 
+	public virtual void OnCollisionStay (Collision collision) {
+
+	}
+
 	public virtual void OnCollisionExit (Collision collision) {
+
+	}
+
+	public virtual void OnTriggerEnter (Collider collider) {
+		
+	}
+
+	public virtual void OnTriggerStay (Collider collider) {
+
+	}
+
+	public virtual void OnTriggerExit (Collider colldier) {
 
 	}
 

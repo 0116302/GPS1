@@ -79,9 +79,9 @@ public class Laser : Defense, ITargeter {
 			lineRenderer.SetPosition (1, laserEnd);
 			lineRenderer.enabled = true;
 
-			if (hit.collider.CompareTag ("Enemy")) {
-				hit.collider.GetComponent<Enemy> ().Damage(damage);
-			}
+//			if (hit.collider.CompareTag ("Enemy")) {
+//				hit.collider.GetComponent<Enemy> ().Damage(damage);
+//			}
 
 			yield return new WaitForSeconds (laserDuration);
 

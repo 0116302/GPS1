@@ -16,7 +16,7 @@ public class FreezeGun : Defense, ITargeter {
 		get { return _target; }
 	}
 
-	private Enemy _hitEnemy;
+	//private Enemy _hitEnemy;
 
 	public float stunDuration = 5.0f;
 
@@ -44,9 +44,9 @@ public class FreezeGun : Defense, ITargeter {
 			}
 
 		} else {
-			if (_hitEnemy == null || _hitEnemy.health <= 0.0f) {
-				lineRenderer.enabled = false;
-			}
+//			if (_hitEnemy == null || _hitEnemy.health <= 0.0f) {
+//				lineRenderer.enabled = false;
+//			}
 		}
 
 		if (cooldown > 0.0f) {
@@ -73,7 +73,7 @@ public class FreezeGun : Defense, ITargeter {
 		if (cooldown <= 0.0f) {
 			StartCoroutine (Fire ());
 
-			if (_isShooting && _hitEnemy != null) cooldown = cooldownDuration;
+//			if (_isShooting && _hitEnemy != null) cooldown = cooldownDuration;
 		}
 	}
 
@@ -91,17 +91,17 @@ public class FreezeGun : Defense, ITargeter {
 			lineRenderer.SetPosition (1, laserEnd);
 			lineRenderer.enabled = true;
 
-			if (hit.collider.CompareTag ("Enemy")) {
-				_hitEnemy = hit.collider.GetComponent<Enemy> ();
-				_hitEnemy.canMove = false;
-
-				_hitEnemy.Damage (damage);
-
-				yield return new WaitForSeconds (stunDuration);
-
-				_hitEnemy.canMove = true; // ISSUE: IF AN ENEMY IS SHOT BY TWO FREEZE GUNS, THE EFFECT WEARS OFF AFTER THE FIRST GUN STOPS
-
-			}
+//			if (hit.collider.CompareTag ("Enemy")) {
+//				_hitEnemy = hit.collider.GetComponent<Enemy> ();
+//				_hitEnemy.canMove = false;
+//
+//				_hitEnemy.Damage (damage);
+//
+//				yield return new WaitForSeconds (stunDuration);
+//
+//				_hitEnemy.canMove = true; // ISSUE: IF AN ENEMY IS SHOT BY TWO FREEZE GUNS, THE EFFECT WEARS OFF AFTER THE FIRST GUN STOPS
+//
+//			}
 
 			lineRenderer.enabled = false;
 
