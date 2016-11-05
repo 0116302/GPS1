@@ -23,6 +23,10 @@ public abstract class CatState {
 
 	}
 
+	public virtual void OnTargetReached () {
+
+	}
+
 	public virtual void OnCollisionEnter (Collision collision) {
 
 	}

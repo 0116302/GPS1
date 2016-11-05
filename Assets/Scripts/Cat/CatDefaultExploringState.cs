@@ -5,12 +5,12 @@ using System.Linq;
 
 public class CatDefaultExploringState : CatExploringState {
 
-	public float roomPadding = 2.0f;
+	public float roomPadding = 1.0f;
 
 	bool targetDetermined = false;
 	Vector3 _targetPosition;
 
-	Coroutine transitioning = null;
+	bool transitioning = false;
 
 	public CatDefaultExploringState (Cat cat) : base(cat) {
 
@@ -21,49 +21,32 @@ public class CatDefaultExploringState : CatExploringState {
 	}
 
 	public override void Update () {
-		if (targetDetermined) {
-
-			if (cat.transform.position == _targetPosition) {
-				
-				if (transitioning == null) {
-					// Done exploring, transition to progressing state
-					transitioning = cat.StartCoroutine (DelayedTransitionCoroutine ());
-
-					// Play the idle/exploring animation
-					cat.animator.SetFloat ("movementSpeed", 0.0f);
-				}
-
-			} else {
-				cat.transform.position = Vector3.MoveTowards (cat.transform.position, _targetPosition, cat.walkingSpeed * Time.deltaTime);
-
-				// Flip cat to face the right direction and play the moving animation
-				FaceTarget ();
-				cat.animator.SetFloat ("movementSpeed", cat.walkingSpeed);
-			}
-
-		} else {
+		if (!targetDetermined) {
 			DetermineTarget ();
+			cat.controller.LockZ ();
+			cat.controller.StartMoving ();
 		}
 	}
 
-	void FaceTarget () {
-		Vector3 scale = cat.transform.localScale;
+	public override void OnTargetReached ()
+	{
+		if (targetDetermined && !transitioning) {
+			// Play the idle/exploring animation
+			cat.controller.StopMoving ();
 
-		float deltaX = _targetPosition.x - cat.transform.position.x;
-		if (deltaX > 0) {
-			scale.x = Mathf.Abs (scale.x);
-
-		} else if (deltaX < 0) {
-			scale.x = -(Mathf.Abs (scale.x));
+			// After done exploring, transition to progressing state
+			cat.StartCoroutine (DelayedTransitionCoroutine ());
 		}
-
-		cat.transform.localScale = scale;
 	}
 
 	IEnumerator DelayedTransitionCoroutine () {
+		if (transitioning) yield break;
+		transitioning = true;
+
 		yield return new WaitForSeconds (3.0f);
-		transitioning = null;
 		ToProgressingState ();
+
+		transitioning = false;
 	}
 
 	void DetermineTarget () {
@@ -76,10 +59,14 @@ public class CatDefaultExploringState : CatExploringState {
 		_targetPosition = cat.transform.position;
 		_targetPosition.x = Random.Range (roomX - roomHalfWidth + roomPadding, roomX + roomHalfWidth - roomPadding);
 
+		cat.controller.SetTarget (_targetPosition);
+
 		targetDetermined = true;
 	}
 
 	public override void ToProgressingState () {
+		Debug.Log ("Entered progressing state!");
+
 		targetDetermined = false;
 		cat.currentState = cat.progressingState;
 	}

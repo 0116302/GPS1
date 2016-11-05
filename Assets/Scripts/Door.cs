@@ -71,6 +71,10 @@ public class Door : MonoBehaviour, ITriggerable {
 		if (playerControlled && cooldown <= 0.0f) {
 			Close ();
 			cooldown = cooldownDuration;
+
+			if (isStaircase) {
+				destination.OnTrigger ();
+			}
 		}
 	}
 

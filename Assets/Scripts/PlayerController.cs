@@ -321,7 +321,6 @@ public class PlayerController : MonoBehaviour {
 
 	IEnumerator MoveCamera (Vector3 destination, float destinationFOV, float duration) {
 		float elapsedTime = 0.0f;
-		YieldInstruction waitForEndOfFrame = new WaitForEndOfFrame ();
 
 		Vector3 startingPosition = mainCamera.transform.position;
 		float startingFOV = mainCamera.fieldOfView;
@@ -331,11 +330,9 @@ public class PlayerController : MonoBehaviour {
 			mainCamera.fieldOfView = Mathf.Lerp (startingFOV, destinationFOV, (elapsedTime / duration));
 
 			elapsedTime += Time.deltaTime;
-			yield return waitForEndOfFrame;
+			yield return null;
 		}
 		mainCamera.transform.position = destination;
 		mainCamera.fieldOfView = destinationFOV;
-
-		yield break;
 	}
 }
