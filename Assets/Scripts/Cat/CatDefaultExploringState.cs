@@ -10,7 +10,9 @@ public class CatDefaultExploringState : CatExploringState {
 	bool targetDetermined = false;
 	Vector3 _targetPosition;
 
-	bool transitioning = false;
+	bool _isTransitioning = false;
+
+	Coroutine transitionCoroutine = null;
 
 	public CatDefaultExploringState (Cat cat) : base(cat) {
 
@@ -30,23 +32,23 @@ public class CatDefaultExploringState : CatExploringState {
 
 	public override void OnTargetReached ()
 	{
-		if (targetDetermined && !transitioning) {
+		if (targetDetermined && !_isTransitioning) {
 			// Play the idle/exploring animation
 			cat.controller.StopMoving ();
 
 			// After done exploring, transition to progressing state
-			cat.StartCoroutine (DelayedTransitionCoroutine ());
+			transitionCoroutine = cat.StartCoroutine (DelayedTransitionCoroutine ());
 		}
 	}
 
 	IEnumerator DelayedTransitionCoroutine () {
-		if (transitioning) yield break;
-		transitioning = true;
+		if (_isTransitioning) yield break;
+		_isTransitioning = true;
 
-		yield return new WaitForSeconds (3.0f);
+		yield return new WaitForSeconds (exploreDuration);
 		ToProgressingState ();
 
-		transitioning = false;
+		_isTransitioning = false;
 	}
 
 	void DetermineTarget () {
@@ -64,10 +66,28 @@ public class CatDefaultExploringState : CatExploringState {
 		targetDetermined = true;
 	}
 
+	public void StopCoroutines () {
+		if (_isTransitioning) {
+			cat.StopCoroutine (transitionCoroutine);
+			_isTransitioning = false;
+		}
+	}
+
 	public override void ToProgressingState () {
 		Debug.Log ("Entered progressing state!");
 
 		targetDetermined = false;
+		StopCoroutines ();
+
 		cat.currentState = cat.progressingState;
+	}
+
+	public override void ToLuredState () {
+		Debug.Log ("Entered lured state!");
+
+		targetDetermined = false;
+		StopCoroutines ();
+
+		cat.currentState = cat.luredState;
 	}
 }

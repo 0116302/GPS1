@@ -36,9 +36,9 @@ public class Cat : Destructible {
 
 	[HideInInspector] public CatState currentState;
 	[HideInInspector] public CatProgressingState progressingState;
-	[HideInInspector] public CatState exploringState;
+	[HideInInspector] public CatExploringState exploringState;
 	[HideInInspector] public CatState panickingState;
-	[HideInInspector] public CatState luredState;
+	[HideInInspector] public CatLuredState luredState;
 
 	public IList<CatStatusEffect> statusEffects = new List<CatStatusEffect> ();
 
@@ -67,6 +67,7 @@ public class Cat : Destructible {
 	protected virtual void AssignStates () {
 		progressingState = new CatDefaultProgressingState (this);
 		exploringState = new CatDefaultExploringState (this);
+		luredState = new CatDefaultLuredState (this);
 		currentState = progressingState;
 	}
 
@@ -79,6 +80,9 @@ public class Cat : Destructible {
 
 	void OnDestroyed () {
 		GameManager.instance.enemiesLeft--;
+		if (GameManager.instance.enemiesLeft == 0) {
+			GUIManager.instance.Win ();
+		}
 
 		//TODO Death effects
 
@@ -228,7 +232,7 @@ public class Cat : Destructible {
 		progressingState.Start ();
 		exploringState.Start ();
 		//panickingState.Start ();
-		//luredState.Start ();
+		luredState.Start ();
 	}
 
 	void Update () {

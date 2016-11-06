@@ -8,6 +8,20 @@ public abstract class CatProgressingState : CatState {
 		get { return _currentRoom; }
 	}
 
+	protected Door _target;
+	public Door target {
+		get {
+			return _target;
+		}
+	}
+
+	protected Vector3 _targetPosition;
+	public Vector3 targetPosition {
+		get {
+			return _targetPosition;
+		}
+	}
+
 	public CatProgressingState (Cat cat) : base (cat) {
 		
 	}

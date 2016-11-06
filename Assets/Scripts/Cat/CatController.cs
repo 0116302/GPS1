@@ -38,33 +38,43 @@ public class CatController : MonoBehaviour {
 	}
 
 	void FixedUpdate () {
-		if (_isMoving && transform.position != _target && !frozen) {
+		if (_isMoving) {
 
-			Vector3 deltaPos = _target - transform.position;
-			Vector3 velocity = deltaPos.normalized * movementSpeed;
-			Vector3 movement = velocity * Time.fixedDeltaTime;
+			if (transform.position != _target && !frozen) {
+				
+				Vector3 deltaPos = _target - transform.position;
+				Vector3 velocity = deltaPos.normalized * movementSpeed;
+				Vector3 movement = velocity * Time.fixedDeltaTime;
 
-			if (movement.sqrMagnitude >= deltaPos.sqrMagnitude) {
+				if (movement.sqrMagnitude >= deltaPos.sqrMagnitude) {
+					// Target reached
+					transform.position = _target;
+					rigidbody.velocity = Vector3.zero;
+					_isMoving = false;
+
+					if (onTargetReached != null) onTargetReached ();
+
+				} else {
+					// Target not yet reached
+					rigidbody.velocity = velocity;
+					animator.SetFloat ("movementSpeed", movementSpeed);
+
+					Vector3 scale = transform.localScale;
+
+					if (movement.x > 0.0f)
+						scale.x = Mathf.Abs (scale.x);
+					else if (movement.x < 0.0f)
+						scale.x = -Mathf.Abs (scale.x);
+
+					transform.localScale = scale;
+				}
+
+			} else if (transform.position == _target) {
 				// Target reached
-				transform.position = _target;
 				rigidbody.velocity = Vector3.zero;
 				_isMoving = false;
 
 				if (onTargetReached != null) onTargetReached ();
-
-			} else {
-				// Target not yet reached
-				rigidbody.velocity = velocity;
-				animator.SetFloat ("movementSpeed", movementSpeed);
-
-				Vector3 scale = transform.localScale;
-
-				if (movement.x > 0.0f)
-					scale.x = Mathf.Abs (scale.x);
-				else if (movement.x < 0.0f)
-					scale.x = -Mathf.Abs (scale.x);
-
-				transform.localScale = scale;
 			}
 
 		} else {
@@ -97,6 +107,14 @@ public class CatController : MonoBehaviour {
 	public void LockX () {
 		rigidbody.constraints =
 			RigidbodyConstraints.FreezePositionX |
+			RigidbodyConstraints.FreezePositionY |
+			RigidbodyConstraints.FreezeRotationX |
+			RigidbodyConstraints.FreezeRotationY |
+			RigidbodyConstraints.FreezeRotationZ;
+	}
+
+	public void UnlockXZ () {
+		rigidbody.constraints =
 			RigidbodyConstraints.FreezePositionY |
 			RigidbodyConstraints.FreezeRotationX |
 			RigidbodyConstraints.FreezeRotationY |

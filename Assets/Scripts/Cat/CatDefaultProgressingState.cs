@@ -29,13 +29,11 @@ public class CatDefaultProgressingState : CatProgressingState {
 		}
 	}
 
-	Door _target;
-	Vector3 _targetPosition;
-
-	bool enteringStaircase = false;
-	bool retargeting = false;
+	bool _isEnteringStaircase = false;
+	bool _isRetargeting = false;
 
 	Coroutine enteringStaircaseCoroutine = null;
+	Coroutine retargetingCoroutine = null;
 
 	public CatDefaultProgressingState (Cat cat) : base(cat) {
 
@@ -46,7 +44,7 @@ public class CatDefaultProgressingState : CatProgressingState {
 	}
 
 	public override void Update () {
-		if (_target == null && !enteringStaircase && !retargeting) {
+		if (_target == null && !_isEnteringStaircase && !_isRetargeting) {
 			// The cat does not have a target and isn't currently retargeting
 
 			DetermineTarget ();
@@ -60,7 +58,7 @@ public class CatDefaultProgressingState : CatProgressingState {
 	public override void OnTargetReached () {
 		// The cat has reached its target
 
-		if (_target != null && !enteringStaircase) {
+		if (_target != null && !_isEnteringStaircase) {
 			Debug.Log ("Target reached!");
 			// The cat has a valid target
 
@@ -189,12 +187,12 @@ public class CatDefaultProgressingState : CatProgressingState {
 	}
 
 	public override void OnCollisionEnter (Collision collision) {
-		if (collision.gameObject.CompareTag ("Door") && !retargeting) {
+		if (collision.gameObject.CompareTag ("Door") && !_isRetargeting) {
 			
 			Vector3 normal = collision.contacts[0].normal;
 			if ((normal.x < 0 && cat.transform.localScale.x > 0) || (normal.x > 0 && cat.transform.localScale.x < 0) || (normal.z < 0)) {
 				// Find a new target if current destination is suddenly blocked by a door
-				cat.StartCoroutine (RetargetCoroutine (true));
+				retargetingCoroutine = cat.StartCoroutine (RetargetCoroutine (true));
 			}
 
 		}
@@ -205,8 +203,8 @@ public class CatDefaultProgressingState : CatProgressingState {
 			Room room = other.GetComponent<Room> ();
 			_currentRoom = room;
 
-			if (!enteringStaircase && !retargeting) {
-				cat.StartCoroutine (RetargetCoroutine ());
+			if (!_isEnteringStaircase && !_isRetargeting) {
+				retargetingCoroutine = cat.StartCoroutine (RetargetCoroutine ());
 			}
 		}
 	}
@@ -220,16 +218,9 @@ public class CatDefaultProgressingState : CatProgressingState {
 		}
 	}
 
-	public override void ToExploringState () {
-		Debug.Log ("Entered exploring state!");
-
-		_target = null;
-		cat.currentState = cat.exploringState;
-	}
-
 	IEnumerator EnteringStaircaseCoroutine () {
-		if (enteringStaircase) yield break;
-		enteringStaircase = true;
+		if (_isEnteringStaircase) yield break;
+		_isEnteringStaircase = true;
 
 		// Flip
 		Vector3 scale = cat.transform.localScale;
@@ -288,16 +279,16 @@ public class CatDefaultProgressingState : CatProgressingState {
 			if (_target != null) cat.controller.StartMoving ();
 		}
 
-		enteringStaircase = false;
+		_isEnteringStaircase = false;
 	}
 
 	IEnumerator RetargetCoroutine (bool tryToOpenDoor = false) {
-		if (retargeting) yield break;
-		retargeting = true;
+		if (_isRetargeting) yield break;
+		_isRetargeting = true;
 
-		if (enteringStaircase) {
+		if (_isEnteringStaircase) {
 			cat.StopCoroutine (enteringStaircaseCoroutine);
-			enteringStaircase = false;
+			_isEnteringStaircase = false;
 		}
 
 		// Stop
@@ -340,6 +331,38 @@ public class CatDefaultProgressingState : CatProgressingState {
 		cat.controller.movementSpeed = cat.walkingSpeed;
 		if (_target != null) cat.controller.StartMoving ();
 
-		retargeting = false;
+		_isRetargeting = false;
+	}
+
+	public void StopCoroutines () {
+
+		if (_isEnteringStaircase) {
+			cat.StopCoroutine (enteringStaircaseCoroutine);
+			_isEnteringStaircase = false;
+		}
+
+		if (_isRetargeting) {
+			cat.StopCoroutine (retargetingCoroutine);
+			_isRetargeting = false;
+		}
+
+	}
+
+	public override void ToExploringState () {
+		Debug.Log ("Entered exploring state!");
+
+		_target = null;
+		StopCoroutines ();
+
+		cat.currentState = cat.exploringState;
+	}
+
+	public override void ToLuredState () {
+		Debug.Log ("Entered lured state!");
+
+		_target = null;
+		StopCoroutines ();
+		
+		cat.currentState = cat.luredState;
 	}
 }
