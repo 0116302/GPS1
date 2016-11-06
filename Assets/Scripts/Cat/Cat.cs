@@ -6,7 +6,7 @@ using System.Linq;
 public class Cat : Destructible {
 
 	public float walkingSpeed = 1.0f;
-	public float enteringStaircaseSpeed = 1.5f;
+	public float enteringStaircaseSpeed = 1.25f;
 
 	[HideInInspector] public float zPosition = 0.0f;
 
@@ -75,7 +75,18 @@ public class Cat : Destructible {
 
 	void OnDamaged (float amount, DamageType type) {
 		//TODO Flash different colors for different damage types
-		Flash (Color.red, 0.1f);
+		if (type == DamageType.Generic || type == DamageType.Impact || type == DamageType.Heat) {
+			Flash (new Color32 (255, 0, 0, 255), 0.1f);
+
+		} else if (type == DamageType.Cold) {
+			Flash (new Color32 (40, 196, 255, 255), 0.1f);
+
+		} else if (type == DamageType.Electricity) {
+			Flash (new Color32 (255, 240, 0, 255), 0.1f);
+
+		} else if (type == DamageType.Poison) {
+			Flash (new Color32 (100, 240, 20, 255), 0.1f);
+		}
 	}
 
 	void OnDestroyed () {

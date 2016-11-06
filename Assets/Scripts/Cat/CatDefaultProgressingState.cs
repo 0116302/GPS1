@@ -58,7 +58,7 @@ public class CatDefaultProgressingState : CatProgressingState {
 	public override void OnTargetReached () {
 		// The cat has reached its target
 
-		if (_target != null && !_isEnteringStaircase) {
+		if (_target != null && !_isEnteringStaircase && !_isRetargeting) {
 			Debug.Log ("Target reached!");
 			// The cat has a valid target
 
@@ -69,7 +69,7 @@ public class CatDefaultProgressingState : CatProgressingState {
 				Debug.Log ("Entering staircase!");
 
 			} else {
-				// Target is a room
+				// Target is a regular room door
 
 				if (GetRoomStatus (_currentRoom).visitCount <= 1) {
 					Debug.Log ("Exploring room for the first time!");
@@ -99,24 +99,29 @@ public class CatDefaultProgressingState : CatProgressingState {
 		List<DoorOption> options = new List<DoorOption> ();
 
 		// Check the left door
-		if (_currentRoom.leftDoor != null && _currentRoom.leftDoor.isOpen) {
+		if (_currentRoom.leftDoor != null) {
 			options.Add (new DoorOption (_currentRoom.leftDoor, _currentRoom.roomLeft));
 		}
 
 		// Check the right door
-		if (_currentRoom.rightDoor != null && _currentRoom.rightDoor.isOpen) {
+		if (_currentRoom.rightDoor != null) {
 			options.Add (new DoorOption (_currentRoom.rightDoor, _currentRoom.roomRight));
 		}
 
 		// Check all the staircase doors
 		foreach (Door door in _currentRoom.staircases) {
-			if (door.isOpen && door.destination != null && door.destination.room != null) {
+			if (door.destination != null && door.destination.room != null) {
 				options.Add (new DoorOption (door, door.destination.room));
 			}
 		}
 
 		// Determine the best option
-		options = options.OrderBy (x => GetRoomStatus (x.destination).isDeadEnd).ThenBy (x => GetRoomStatus (x.destination).visitCount).ThenBy (x => Random.Range (int.MinValue, int.MaxValue)).ToList ();
+		options = options.OrderBy (x => GetRoomStatus (x.destination).isDeadEnd)
+			.ThenBy (x => (x.door.isOpen) ? 0 : 1)
+			.ThenBy (x => GetRoomStatus (x.destination).visitCount)
+			.ThenBy (x => Random.Range (int.MinValue, int.MaxValue))
+			.ToList ();
+		
 		if (options.Count == 0) {
 			// No valid paths
 			_target = null;
@@ -174,18 +179,6 @@ public class CatDefaultProgressingState : CatProgressingState {
 		roomStatus [room] = status;
 	}
 
-	public override void OnTriggerEnter (Collider other) {
-		if (other.CompareTag("Room")) {
-			Room room = other.GetComponent<Room> ();
-			if (room != _currentRoom) {
-				_currentRoom = room;
-
-				// Count visit
-				IncrementVisitCount (_currentRoom);
-			}
-		}
-	}
-
 	public override void OnCollisionEnter (Collision collision) {
 		if (collision.gameObject.CompareTag ("Door") && !_isRetargeting) {
 			
@@ -195,6 +188,18 @@ public class CatDefaultProgressingState : CatProgressingState {
 				retargetingCoroutine = cat.StartCoroutine (RetargetCoroutine (true));
 			}
 
+		}
+	}
+
+	public override void OnTriggerEnter (Collider other) {
+		if (other.CompareTag("Room")) {
+			Room room = other.GetComponent<Room> ();
+			if (room != _currentRoom) {
+				_currentRoom = room;
+
+				// Count visit
+				IncrementVisitCount (_currentRoom);
+			}
 		}
 	}
 
@@ -291,31 +296,39 @@ public class CatDefaultProgressingState : CatProgressingState {
 			_isEnteringStaircase = false;
 		}
 
+		Debug.Log ("Retargeting!");
+		Door oldTarget = _target;
+		_target = null;
+
 		// Stop
 		yield return new WaitForSeconds (0.5f);
-		_target = null;
 		cat.controller.StopMoving ();
 
 		if (tryToOpenDoor) {
 			cat.animator.SetBool ("tryingToOpenDoor", true);
-			yield return new WaitForSeconds (2.0f);
-			cat.animator.SetBool ("tryingToOpenDoor", false);
-
-		} else {
-			yield return new WaitForSeconds (2.0f);
 		}
 
-		// Return to original Z position
-		if (cat.transform.position.z != cat.zPosition) {
+		// Find a new target
+		do {
+			
+			DetermineTarget ();
+			yield return new WaitForSeconds (1.0f);
+
+		} while (_target == null || (_target == oldTarget && !_target.isOpen));
+
+		cat.animator.SetBool ("tryingToOpenDoor", false);
+
+		// Return to original Z position if necessary
+		if (cat.transform.position.z != cat.zPosition && !(_target.isStaircase && cat.transform.position.x == _target.teleportPosition.position.x)) {
 
 			Vector3 scale = cat.transform.localScale;
 			scale.x = -scale.x;
 			cat.transform.localScale = scale;
 
 			cat.controller.LockX ();
-			_targetPosition = cat.transform.position;
-			_targetPosition.z = cat.zPosition;
-			cat.controller.SetTarget (_targetPosition);
+			Vector3 pos = cat.transform.position;
+			pos.z = cat.zPosition;
+			cat.controller.SetTarget (pos);
 			cat.controller.movementSpeed = cat.enteringStaircaseSpeed;
 			cat.controller.StartMoving ();
 
@@ -325,11 +338,11 @@ public class CatDefaultProgressingState : CatProgressingState {
 
 		}
 
-		// Retarget and move
-		DetermineTarget ();
+		// Start moving towards the new target
+		cat.controller.SetTarget (_targetPosition);
 		cat.controller.LockZ ();
 		cat.controller.movementSpeed = cat.walkingSpeed;
-		if (_target != null) cat.controller.StartMoving ();
+		cat.controller.StartMoving ();
 
 		_isRetargeting = false;
 	}
