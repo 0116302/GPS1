@@ -13,6 +13,13 @@ public class Door : MonoBehaviour, ITriggerable {
 		get { return _isOpen; }
 	}
 
+	public bool _isBroken = false;
+	public bool isBroken {
+		get {
+			return _isBroken;
+		}
+	}
+
 	[Header ("Cooldown")]
 	public CooldownIndicator cooldownIndicator;
 	private float cooldown = 0.0f;
@@ -39,7 +46,7 @@ public class Door : MonoBehaviour, ITriggerable {
 			cooldown -= Time.deltaTime;
 
 			if (cooldownIndicator != null) {
-				cooldownIndicator.cooldownValue = cooldown / cooldownDuration;
+				cooldownIndicator.value = cooldown / cooldownDuration;
 			}
 
 			if (cooldown <= cooldownDuration - closeDuration) {
@@ -50,7 +57,7 @@ public class Door : MonoBehaviour, ITriggerable {
 			cooldown = 0.0f;
 
 			if (cooldownIndicator != null) {
-				cooldownIndicator.cooldownValue = 0.0f;
+				cooldownIndicator.value = 0.0f;
 			}
 		}
 	}
@@ -68,12 +75,14 @@ public class Door : MonoBehaviour, ITriggerable {
 	}
 
 	public void OnTrigger () {
-		if (playerControlled && cooldown <= 0.0f) {
-			Close ();
-			cooldown = cooldownDuration;
+		if (playerControlled && !_isBroken && cooldown <= 0.0f) {
+			if (!isStaircase || !destination._isBroken) {
+				Close ();
+				cooldown = cooldownDuration;
 
-			if (isStaircase) {
-				destination.OnTrigger ();
+				if (isStaircase) {
+					destination.OnTrigger ();
+				}
 			}
 		}
 	}
@@ -88,11 +97,21 @@ public class Door : MonoBehaviour, ITriggerable {
 		_isOpen = false;
 	}
 
-	public void Toggle() {
+	public void Toggle () {
 		if (_isOpen) {
 			Close ();
 		} else {
 			Open ();
+		}
+	}
+
+	public void BreakOpen () {
+		animator.SetBool ("isOpen", true);
+		_isOpen = true;
+		_isBroken = true;
+
+		if (isStaircase) {
+			destination.Open ();
 		}
 	}
 }

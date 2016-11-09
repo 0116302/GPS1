@@ -32,8 +32,8 @@ public class GameManager : MonoBehaviour {
 
 	[Header ("Level Setup")]
 	public TimedSpawner enemySpawner;
-	public int enemyCount = 10;
-	public int startingCash = 10000;
+	public int enemyCount = 30;
+	public int startingCash = 30000;
 
 	[HideInInspector]
 	public int enemiesLeft;
@@ -50,6 +50,7 @@ public class GameManager : MonoBehaviour {
 	}
 
 	public void Initialize () {
+		enemyCount = enemySpawner.spawns.Count;
 		enemiesLeft = enemyCount;
 		cash = startingCash;
 	}
@@ -62,9 +63,11 @@ public class GameManager : MonoBehaviour {
 
 	public void Lose () {
 		_gamePhase = GamePhase.Lose;
+		GUIManager.instance.Lose ();
 	}
 
 	public void Win () {
 		_gamePhase = GamePhase.Win;
+		GUIManager.instance.Win ();
 	}
 }

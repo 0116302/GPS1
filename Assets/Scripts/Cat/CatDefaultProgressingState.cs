@@ -39,18 +39,15 @@ public class CatDefaultProgressingState : CatProgressingState {
 
 	}
 
-	public override void Start () {
-		
-	}
-
 	public override void Update () {
-		if (_target == null && !_isEnteringStaircase && !_isRetargeting) {
-			// The cat does not have a target and isn't currently retargeting
+		if (_target == null  && cat.currentRoom != null && !_isEnteringStaircase && !_isRetargeting) {
+			// The cat does not have a target and isn't currently retargeting (probably just transitioned from another state)
 
-			DetermineTarget ();
-			cat.controller.LockZ ();
-			cat.controller.movementSpeed = cat.walkingSpeed;
-			if (_target != null) cat.controller.StartMoving ();
+			// Evaluate the room
+			EvaluateRoom (cat.currentRoom);
+
+			// Determine a target and move towards it
+			retargetingCoroutine = cat.StartCoroutine (RetargetCoroutine ());
 
 		}
 	}
@@ -71,7 +68,10 @@ public class CatDefaultProgressingState : CatProgressingState {
 			} else {
 				// Target is a regular room door
 
-				if (GetRoomStatus (_currentRoom).visitCount <= 1) {
+				// Evaluate the room
+				EvaluateRoom (cat.currentRoom);
+
+				if (GetRoomStatus (cat.currentRoom).visitCount <= 1) {
 					Debug.Log ("Exploring room for the first time!");
 					// First time in this room, explore it
 					ToExploringState ();
@@ -79,10 +79,7 @@ public class CatDefaultProgressingState : CatProgressingState {
 				} else {
 					Debug.Log ("Been here before!");
 					// Been here before, just move on
-					DetermineTarget ();
-					cat.controller.LockZ ();
-					cat.controller.movementSpeed = cat.walkingSpeed;
-					if (_target != null) cat.controller.StartMoving ();
+					retargetingCoroutine = cat.StartCoroutine (RetargetCoroutine ());
 				}
 
 			}
@@ -92,24 +89,22 @@ public class CatDefaultProgressingState : CatProgressingState {
 	}
 
 	void DetermineTarget () {
-		if (_currentRoom == null) return;
-
-		Debug.Log ("Determining next target!");
+		if (cat.currentRoom == null) return;
 
 		List<DoorOption> options = new List<DoorOption> ();
 
 		// Check the left door
-		if (_currentRoom.leftDoor != null) {
-			options.Add (new DoorOption (_currentRoom.leftDoor, _currentRoom.roomLeft));
+		if (cat.currentRoom.leftDoor != null) {
+			options.Add (new DoorOption (cat.currentRoom.leftDoor, cat.currentRoom.roomLeft));
 		}
 
 		// Check the right door
-		if (_currentRoom.rightDoor != null) {
-			options.Add (new DoorOption (_currentRoom.rightDoor, _currentRoom.roomRight));
+		if (cat.currentRoom.rightDoor != null) {
+			options.Add (new DoorOption (cat.currentRoom.rightDoor, cat.currentRoom.roomRight));
 		}
 
 		// Check all the staircase doors
-		foreach (Door door in _currentRoom.staircases) {
+		foreach (Door door in cat.currentRoom.staircases) {
 			if (door.destination != null && door.destination.room != null) {
 				options.Add (new DoorOption (door, door.destination.room));
 			}
@@ -150,21 +145,21 @@ public class CatDefaultProgressingState : CatProgressingState {
 		return status;
 	}
 
-	void IncrementVisitCount (Room room) {
+	void EvaluateRoom (Room room) {
 		RoomStatus status = new RoomStatus ();
 		roomStatus.TryGetValue (room, out status);
 
 		int validPaths = 0;
 
-		if (_currentRoom.leftDoor != null && _currentRoom.roomLeft != null && !GetRoomStatus (_currentRoom.roomLeft).isDeadEnd) {
+		if (cat.currentRoom.leftDoor != null && cat.currentRoom.roomLeft != null && !GetRoomStatus (cat.currentRoom.roomLeft).isDeadEnd) {
 			validPaths++;
 		}
 
-		if (_currentRoom.rightDoor != null && _currentRoom.roomRight != null && !GetRoomStatus (_currentRoom.roomRight).isDeadEnd) {
+		if (cat.currentRoom.rightDoor != null && cat.currentRoom.roomRight != null && !GetRoomStatus (cat.currentRoom.roomRight).isDeadEnd) {
 			validPaths++;
 		}
 
-		foreach (Door door in _currentRoom.staircases) {
+		foreach (Door door in cat.currentRoom.staircases) {
 			if (door.destination != null && door.destination.room != null && !GetRoomStatus (door.destination.room).isDeadEnd) {
 				validPaths++;
 			}
@@ -185,41 +180,9 @@ public class CatDefaultProgressingState : CatProgressingState {
 			Vector3 normal = collision.contacts[0].normal;
 			if ((normal.x < 0 && cat.transform.localScale.x > 0) || (normal.x > 0 && cat.transform.localScale.x < 0) || (normal.z < 0)) {
 				// Find a new target if current destination is suddenly blocked by a door
-				retargetingCoroutine = cat.StartCoroutine (RetargetCoroutine (true));
+				retargetingCoroutine = cat.StartCoroutine (RetargetCoroutine (2.0f, true));
 			}
 
-		}
-	}
-
-	public override void OnTriggerEnter (Collider other) {
-		if (other.CompareTag("Room")) {
-			Room room = other.GetComponent<Room> ();
-			if (room != _currentRoom) {
-				_currentRoom = room;
-
-				// Count visit
-				IncrementVisitCount (_currentRoom);
-			}
-		}
-	}
-
-	public override void OnTriggerStay (Collider other) {
-		if (other.CompareTag("Room") && _currentRoom == null) {
-			Room room = other.GetComponent<Room> ();
-			_currentRoom = room;
-
-			if (!_isEnteringStaircase && !_isRetargeting) {
-				retargetingCoroutine = cat.StartCoroutine (RetargetCoroutine ());
-			}
-		}
-	}
-
-	public override void OnTriggerExit (Collider other) {
-		if (other.CompareTag("Room")) {
-			Room room = other.GetComponent<Room> ();
-			if (room == _currentRoom) {
-				_currentRoom = null;
-			}
 		}
 	}
 
@@ -236,7 +199,7 @@ public class CatDefaultProgressingState : CatProgressingState {
 		cat.controller.LockX ();
 		_targetPosition = _target.teleportPosition.position;
 		cat.controller.SetTarget (_targetPosition);
-		cat.controller.movementSpeed = cat.enteringStaircaseSpeed;
+		cat.controller.movementSpeed = cat.walkingSpeed * cat.enteringStaircaseMultiplier;
 		cat.controller.StartMoving ();
 
 		while (!cat.controller.reachedTarget) {
@@ -262,7 +225,7 @@ public class CatDefaultProgressingState : CatProgressingState {
 		_targetPosition = _target.destination.teleportPosition.position;
 		_targetPosition.z = cat.zPosition;
 		cat.controller.SetTarget (_targetPosition);
-		cat.controller.movementSpeed = cat.enteringStaircaseSpeed;
+		cat.controller.movementSpeed = cat.walkingSpeed * cat.enteringStaircaseMultiplier;
 		cat.controller.StartMoving ();
 
 		while (!cat.controller.reachedTarget) {
@@ -274,20 +237,19 @@ public class CatDefaultProgressingState : CatProgressingState {
 		cat.controller.movementSpeed = cat.walkingSpeed;
 
 		// Determine next target / state
-		if (GetRoomStatus (_currentRoom).visitCount <= 1) {
+		if (GetRoomStatus (cat.currentRoom).visitCount <= 1) {
 			// First time in this room, explore it
 			ToExploringState ();
 
 		} else {
 			// Been here before, just move on
-			DetermineTarget ();
-			if (_target != null) cat.controller.StartMoving ();
+			retargetingCoroutine = cat.StartCoroutine (RetargetCoroutine ());
 		}
 
 		_isEnteringStaircase = false;
 	}
 
-	IEnumerator RetargetCoroutine (bool tryToOpenDoor = false) {
+	IEnumerator RetargetCoroutine (float retryDelay = 0.0f, bool tryToOpenDoor = false) {
 		if (_isRetargeting) yield break;
 		_isRetargeting = true;
 
@@ -301,7 +263,6 @@ public class CatDefaultProgressingState : CatProgressingState {
 		_target = null;
 
 		// Stop
-		yield return new WaitForSeconds (0.5f);
 		cat.controller.StopMoving ();
 
 		if (tryToOpenDoor) {
@@ -310,9 +271,9 @@ public class CatDefaultProgressingState : CatProgressingState {
 
 		// Find a new target
 		do {
-			
+
+			yield return new WaitForSeconds (retryDelay);
 			DetermineTarget ();
-			yield return new WaitForSeconds (1.0f);
 
 		} while (_target == null || (_target == oldTarget && !_target.isOpen));
 
@@ -329,7 +290,7 @@ public class CatDefaultProgressingState : CatProgressingState {
 			Vector3 pos = cat.transform.position;
 			pos.z = cat.zPosition;
 			cat.controller.SetTarget (pos);
-			cat.controller.movementSpeed = cat.enteringStaircaseSpeed;
+			cat.controller.movementSpeed = cat.walkingSpeed * cat.enteringStaircaseMultiplier;
 			cat.controller.StartMoving ();
 
 			while (!cat.controller.reachedTarget) {
@@ -368,6 +329,15 @@ public class CatDefaultProgressingState : CatProgressingState {
 		StopCoroutines ();
 
 		cat.currentState = cat.exploringState;
+	}
+
+	public override void ToPanickingState () {
+		Debug.Log ("Entered panicking state!");
+
+		_target = null;
+		StopCoroutines ();
+
+		cat.currentState = cat.panickingState;
 	}
 
 	public override void ToLuredState () {

@@ -14,8 +14,8 @@ public enum DamageType {
 public class Destructible : MonoBehaviour {
 
 	[Header("Health")]
-	public float health = 100f;
-	public float maximumHealth = 100f;
+	public float health = 10.0f;
+	public float maximumHealth = 10.0f;
 
 	private bool _isDead = false;
 	public bool isDead {
@@ -39,6 +39,18 @@ public class Destructible : MonoBehaviour {
 		if (amount > 0 && onDamaged != null) onDamaged (amount, type);
 
 		if (!_isDead && health <= 0.0f) {
+			if (onDestroyed != null) onDestroyed ();
+			_isDead = true;
+		}
+	}
+
+	public virtual void Destroy (DamageType type = DamageType.Generic) {
+		if (!_isDead) {
+			float amount = health;
+			health = 0.0f;
+
+			if (health > 0 && onDamaged != null) onDamaged (amount, type);
+
 			if (onDestroyed != null) onDestroyed ();
 			_isDead = true;
 		}

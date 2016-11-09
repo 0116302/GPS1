@@ -3,12 +3,16 @@ using System.Collections;
 
 public class CatBurningStatusEffect : CatStatusEffect {
 
+	public CatBurningStatusEffect (float duration) {
+		this.duration = duration;
+	}
+
 	public override void Start () {
-		tickFrequency = 2.0f;
+		cat.panickingState.Panic (duration);
 	}
 
 	public override void Tick () {
-		cat.Damage (0.5f);
+		cat.Damage (0.1f, DamageType.Heat);
 	}
 
 	public override void End () {

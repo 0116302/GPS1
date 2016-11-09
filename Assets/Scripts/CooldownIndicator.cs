@@ -2,18 +2,18 @@
 using UnityEngine.UI;
 using System.Collections;
 
-public class CooldownIndicator : MonoBehaviour {
+public abstract class CooldownIndicator : MonoBehaviour {
 
-	public Image overlay;
 	[Range (0.0f, 1.0f)]
-	public float cooldownValue = 0.0f;
-	
-	void OnValidate () {
-		overlay.fillAmount = cooldownValue;
+	protected float _value = 0.0f;
+	public float value {
+		get {
+			return _value;
+		}
+
+		set {
+			_value = Mathf.Clamp (value, 0.0f, 1.0f);
+		}
 	}
-	
-	// Update is called once per frame
-	void Update () {
-		overlay.fillAmount = cooldownValue;
-	}
+
 }

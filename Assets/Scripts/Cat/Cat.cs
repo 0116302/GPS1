@@ -6,7 +6,10 @@ using System.Linq;
 public class Cat : Destructible {
 
 	public float walkingSpeed = 1.0f;
-	public float enteringStaircaseSpeed = 1.25f;
+	public float panickingSpeed = 2.0f;
+	public float enteringStaircaseMultiplier = 1.25f;
+
+	public TextMesh healthDisplay; //TODO Replace this
 
 	[HideInInspector] public float zPosition = 0.0f;
 
@@ -34,10 +37,32 @@ public class Cat : Destructible {
 	public SpriteRenderer rightFoot;
 	public SpriteRenderer tail;
 
+	[Header ("Drops")]
+	public GameObject decapitatedHeadPrefab;
+
+	[HideInInspector] public bool flashOnDamage = true;
+
+	protected Room _currentRoom = null;
+	public Room currentRoom {
+		get { return _currentRoom; }
+	}
+
+	public bool isFacingLeft {
+		get {
+			return transform.localScale.x < 0;
+		}
+	}
+
+	public bool isFacingRight {
+		get {
+			return transform.localScale.x > 0;
+		}
+	}
+
 	[HideInInspector] public CatState currentState;
 	[HideInInspector] public CatProgressingState progressingState;
 	[HideInInspector] public CatExploringState exploringState;
-	[HideInInspector] public CatState panickingState;
+	[HideInInspector] public CatPanickingState panickingState;
 	[HideInInspector] public CatLuredState luredState;
 
 	public IList<CatStatusEffect> statusEffects = new List<CatStatusEffect> ();
@@ -67,6 +92,7 @@ public class Cat : Destructible {
 	protected virtual void AssignStates () {
 		progressingState = new CatDefaultProgressingState (this);
 		exploringState = new CatDefaultExploringState (this);
+		panickingState = new CatDefaultPanickingState (this);
 		luredState = new CatDefaultLuredState (this);
 		currentState = progressingState;
 	}
@@ -74,28 +100,38 @@ public class Cat : Destructible {
 	// Event handlers
 
 	void OnDamaged (float amount, DamageType type) {
-		//TODO Flash different colors for different damage types
-		if (type == DamageType.Generic || type == DamageType.Impact || type == DamageType.Heat) {
-			Flash (new Color32 (255, 0, 0, 255), 0.1f);
 
-		} else if (type == DamageType.Cold) {
-			Flash (new Color32 (40, 196, 255, 255), 0.1f);
+		// Flash different colors for different damage types
+		if (flashOnDamage) {
+			if (type == DamageType.Generic || type == DamageType.Impact || type == DamageType.Heat) {
+				Flash (new Color32 (255, 0, 0, 255), 0.1f);
 
-		} else if (type == DamageType.Electricity) {
-			Flash (new Color32 (255, 240, 0, 255), 0.1f);
+			} else if (type == DamageType.Cold) {
+				Flash (new Color32 (40, 196, 255, 255), 0.1f);
 
-		} else if (type == DamageType.Poison) {
-			Flash (new Color32 (100, 240, 20, 255), 0.1f);
+			} else if (type == DamageType.Electricity) {
+				Flash (new Color32 (255, 240, 0, 255), 0.1f);
+
+			} else if (type == DamageType.Poison) {
+				Flash (new Color32 (100, 240, 20, 255), 0.1f);
+			}
+		}
+
+		if (healthDisplay != null) {
+			healthDisplay.text = new string ('♥', Mathf.CeilToInt(this.health / this.maximumHealth * 3.0f));
 		}
 	}
 
 	void OnDestroyed () {
 		GameManager.instance.enemiesLeft--;
 		if (GameManager.instance.enemiesLeft == 0) {
-			GUIManager.instance.Win ();
+			GameManager.instance.Win ();
 		}
 
-		//TODO Death effects
+		// Head popping off
+		Rigidbody decapitatedHead = ((GameObject) GameObject.Instantiate (decapitatedHeadPrefab, head.transform.position, head.transform.rotation)).GetComponent<Rigidbody> ();
+		decapitatedHead.AddForce (new Vector3(-0.5f, 2f, 0f), ForceMode.Impulse);
+		decapitatedHead.GetComponent<SpriteRenderer> ().sprite = head.sprite;
 
 		Destroy (gameObject);
 	}
@@ -242,7 +278,7 @@ public class Cat : Destructible {
 	void Start () {
 		progressingState.Start ();
 		exploringState.Start ();
-		//panickingState.Start ();
+		panickingState.Start ();
 		luredState.Start ();
 	}
 
@@ -271,14 +307,38 @@ public class Cat : Destructible {
 	}
 
 	void OnTriggerEnter (Collider collider) {
+		if (collider.CompareTag("Room")) {
+			Room room = collider.GetComponent<Room> ();
+			if (room != _currentRoom) {
+				_currentRoom = room;
+
+				// Check if the cat has reached the control room
+				if (_currentRoom.roomName == "Control Room") {
+					GameManager.instance.Lose ();
+				}
+			}
+		}
+
 		currentState.OnTriggerEnter (collider);
 	}
 
 	void OnTriggerStay (Collider collider) {
+		if (collider.CompareTag("Room") && _currentRoom == null) {
+			Room room = collider.GetComponent<Room> ();
+			_currentRoom = room;
+		}
+
 		currentState.OnTriggerStay (collider);
 	}
 
 	void OnTriggerExit (Collider collider) {
+		if (collider.CompareTag("Room")) {
+			Room room = collider.GetComponent<Room> ();
+			if (room == _currentRoom) {
+				_currentRoom = null;
+			}
+		}
+
 		currentState.OnTriggerExit (collider);
 	}
 }

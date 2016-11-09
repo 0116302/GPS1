@@ -61,7 +61,7 @@ public abstract class CatState {
 		cat.currentState = cat.exploringState;
 	}
 
-	public virtual void ToPanickedState () {
+	public virtual void ToPanickingState () {
 		cat.currentState = cat.panickingState;
 	}
 

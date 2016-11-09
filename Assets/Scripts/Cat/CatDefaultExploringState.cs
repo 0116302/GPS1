@@ -18,10 +18,6 @@ public class CatDefaultExploringState : CatExploringState {
 
 	}
 
-	public override void Start () {
-		
-	}
-
 	public override void Update () {
 		if (!targetDetermined) {
 			DetermineTarget ();
@@ -52,11 +48,10 @@ public class CatDefaultExploringState : CatExploringState {
 	}
 
 	void DetermineTarget () {
-		_currentRoom = cat.progressingState.currentRoom;
-		if (_currentRoom == null) return;
+		if (cat.currentRoom == null) return;
 
-		float roomX = _currentRoom.transform.position.x;
-		float roomHalfWidth = _currentRoom.roomWidth / 2.0f;
+		float roomX = cat.currentRoom.transform.position.x;
+		float roomHalfWidth = cat.currentRoom.roomWidth / 2.0f;
 
 		_targetPosition = cat.transform.position;
 		_targetPosition.x = Random.Range (roomX - roomHalfWidth + roomPadding, roomX + roomHalfWidth - roomPadding);
@@ -80,6 +75,15 @@ public class CatDefaultExploringState : CatExploringState {
 		StopCoroutines ();
 
 		cat.currentState = cat.progressingState;
+	}
+
+	public override void ToPanickingState () {
+		Debug.Log ("Entered panicking state!");
+
+		targetDetermined = false;
+		StopCoroutines ();
+
+		cat.currentState = cat.panickingState;
 	}
 
 	public override void ToLuredState () {

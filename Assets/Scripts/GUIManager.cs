@@ -59,6 +59,7 @@ public class GUIManager : MonoBehaviour {
 	}
 
 	public void RestartLevel () {
+		GameManager.instance.Initialize ();
 		SceneManager.LoadScene ("GameScene");
 	}
 }

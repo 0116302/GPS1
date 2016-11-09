@@ -80,7 +80,6 @@ public class PlayerController : MonoBehaviour {
 			if (Physics.Raycast (ray, out hit, raycastDistance, layerMask, QueryTriggerInteraction.Collide)) {
 				if (hit.collider.CompareTag ("Room")) {
 					room = hit.collider.GetComponent<Room> ();
-					//TODO Indicate that this is the room is being hovered on
 				}
 			}
 
@@ -113,12 +112,26 @@ public class PlayerController : MonoBehaviour {
 					_cursor = hit.point - _placementOrigin;
 					_cursor.z = _placementOrigin.z;
 
-					// Snap to grid
-					_cellX = Mathf.FloorToInt ((_cursor.x / (float)_selected.gridSnapX));
-					_cellY = Mathf.CeilToInt ((_cursor.y / (float)_selected.gridSnapY));
+					float halfWidth = _selected.width / 2;
+					bool oddWidth = _selected.width % 2 != 0;
 
-					_cursor.x = (float)_cellX * _selected.gridSnapX;
-					_cursor.y = (float)_cellY * _selected.gridSnapY;
+					float halfHeight = _selected.height / 2;
+					bool oddHeight = _selected.height % 2 != 0;
+
+					// Snap to grid
+					_cellX = Mathf.FloorToInt ((_cursor.x / (float)_selected.horizontalSnap));
+					_cellY = Mathf.CeilToInt ((_cursor.y / (float)_selected.verticalSnap));
+
+					_cellX -= Mathf.FloorToInt (halfWidth);
+					_cellY += Mathf.FloorToInt (halfHeight);
+
+					_cursor.x = (float)_cellX * _selected.horizontalSnap + halfWidth;
+					_cursor.y = (float)_cellY * _selected.verticalSnap - halfHeight;
+
+					if (oddWidth)
+						_cursor.x += 0.5f;
+					if (oddHeight)
+						_cursor.y -= 0.5f;
 
 					if (!_selected.gameObject.activeSelf) _selected.gameObject.SetActive (true);
 					_selected.transform.position = _placementOrigin + _cursor + _selected.placementOffset;

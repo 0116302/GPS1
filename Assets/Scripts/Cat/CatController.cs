@@ -38,9 +38,9 @@ public class CatController : MonoBehaviour {
 	}
 
 	void FixedUpdate () {
-		if (_isMoving) {
+		if (_isMoving && !frozen) {
 
-			if (transform.position != _target && !frozen) {
+			if (transform.position != _target) {
 				
 				Vector3 deltaPos = _target - transform.position;
 				Vector3 velocity = deltaPos.normalized * movementSpeed;
@@ -55,6 +55,7 @@ public class CatController : MonoBehaviour {
 					if (onTargetReached != null) onTargetReached ();
 
 				} else {
+
 					// Target not yet reached
 					rigidbody.velocity = velocity;
 					animator.SetFloat ("movementSpeed", movementSpeed);
@@ -71,6 +72,7 @@ public class CatController : MonoBehaviour {
 
 			} else if (transform.position == _target) {
 				// Target reached
+				transform.position = _target;
 				rigidbody.velocity = Vector3.zero;
 				_isMoving = false;
 

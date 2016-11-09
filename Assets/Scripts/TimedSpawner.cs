@@ -2,19 +2,28 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class TimedSpawner : MonoBehaviour {
-
+[System.Serializable]
+public struct SpawnInstruction {
 	public GameObject prefab;
-	public List<float> spawnTimes = new List<float> ();
+	public float delay;
+
+	public SpawnInstruction (GameObject prefab, float delay) {
+		this.prefab = prefab;
+		this.delay = delay;
+	}
+}
+
+public class TimedSpawner : MonoBehaviour {
+	public List<SpawnInstruction> spawns = new List<SpawnInstruction> ();
 
 	private float elapsedTime = 0.0f;
 	
 	// Update is called once per frame
 	void Update () {
 		elapsedTime += Time.deltaTime;
-		if (spawnTimes.Count >= 1 && elapsedTime >= spawnTimes[0]) {
-			GameObject.Instantiate (prefab, transform.position, transform.rotation);
-			spawnTimes.RemoveAt (0);
+		if (spawns.Count >= 1 && elapsedTime >= spawns[0].delay) {
+			GameObject.Instantiate (spawns[0].prefab, transform.position, transform.rotation);
+			spawns.RemoveAt (0);
 			elapsedTime = 0.0f;
 		}
 	}
