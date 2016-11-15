@@ -123,15 +123,21 @@ public class Cat : Destructible {
 	}
 
 	void OnDestroyed () {
-		GameManager.instance.enemiesLeft--;
-		if (GameManager.instance.enemiesLeft == 0) {
-			GameManager.instance.Win ();
+		// Stop all status effect coroutines
+		foreach (CatStatusEffect effect in statusEffects) {
+			StopCoroutine (effect.coroutine);
 		}
 
 		// Head popping off
 		Rigidbody decapitatedHead = ((GameObject) GameObject.Instantiate (decapitatedHeadPrefab, head.transform.position, head.transform.rotation)).GetComponent<Rigidbody> ();
 		decapitatedHead.AddForce (new Vector3(-0.5f, 2f, 0f), ForceMode.Impulse);
 		decapitatedHead.GetComponent<SpriteRenderer> ().sprite = head.sprite;
+
+		// Update the number of enemies left
+		GameManager.instance.enemiesLeft--;
+		if (GameManager.instance.enemiesLeft == 0) {
+			GameManager.instance.Win ();
+		}
 
 		Destroy (gameObject);
 	}
@@ -161,8 +167,8 @@ public class Cat : Destructible {
 	public int HasStatusEffect<T> () {
 		int count = 0;
 
-		foreach (CatStatusEffect e in statusEffects) {
-			if (e.GetType () == typeof(T))
+		foreach (CatStatusEffect effect in statusEffects) {
+			if (effect.GetType () == typeof(T))
 				count++;
 		}
 

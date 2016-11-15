@@ -30,11 +30,31 @@ public class Room : MonoBehaviour {
 	[Header ("Visual Settings")]
 	public float gridAlpha = 0.8f;
 
+	[HideInInspector] public List<Cat> occupants = new List<Cat> ();
+
 	void Start () {
 		Material material = placementGrid.GetComponent<Renderer> ().material;
 		Color color = material.color;
 		color.a = 0.0f;
 		material.color = color;
+	}
+
+	void OnTriggerEnter (Collider other) {
+		if (other.CompareTag ("Enemy")) {
+			Cat enemy = other.GetComponent<Cat> ();
+			if (enemy != null) {
+				occupants.Add (enemy);
+			}
+		}
+	}
+
+	void OnTriggerExit (Collider other) {
+		if (other.CompareTag ("Enemy")) {
+			Cat enemy = other.GetComponent<Cat> ();
+			if (enemy != null) {
+				occupants.Remove (enemy);
+			}
+		}
 	}
 
 	public void fadeInGrid (float duration = 0.5f) {

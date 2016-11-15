@@ -26,12 +26,12 @@ public class Hologram : Lure, IMultiTargeter {
 	void Update () {
 		if (placeableParent != null && !placeableParent.placed) return;
 
-		if (_isActive && disarmed) {
+		if (_isActive && _isDisarmed) {
 			_isActive = false;
 			projection.enabled = false;
 		}
 
-		if (!disarmed || uses >= maxUses) {
+		if (!_isDisarmed && uses < maxUses) {
 			
 			if (cooldown > 0.0f) {
 				cooldown -= Time.deltaTime;
@@ -72,7 +72,7 @@ public class Hologram : Lure, IMultiTargeter {
 	}
 
 	public void Activate () {
-		if (disarmed || uses >= maxUses) return;
+		if (_isDisarmed || uses >= maxUses) return;
 
 		_isActive = true;
 		uses++;

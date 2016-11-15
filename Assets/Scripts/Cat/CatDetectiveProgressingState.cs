@@ -193,7 +193,7 @@ public class CatDetectiveProgressingState : CatProgressingState {
 		if (other.CompareTag ("Defense") && !_isEnteringStaircase && !_isRetargeting) {
 			Defense defense = other.GetComponentInChildren<Defense> ();
 
-			if (!defense.disarmed && (!canBeLured || !(defense is Lure))) {
+			if (defense != null && !defense.isDisarmed && (!canBeLured || !(defense is Lure))) {
 				// Disarm trap
 				cat.StartCoroutine (DisarmTrapCoroutine (defense, 1.0f));
 			}
@@ -210,7 +210,7 @@ public class CatDetectiveProgressingState : CatProgressingState {
 
 		yield return new WaitForSeconds (1.0f);
 
-		defense.disarmed = true;
+		defense.Disarm ();
 
 		yield return new WaitForSeconds (duration);
 

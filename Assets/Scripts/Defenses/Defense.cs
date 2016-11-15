@@ -4,7 +4,13 @@ using System.Collections;
 public abstract class Defense : MonoBehaviour, ITriggerable {
 
 	public Placeable placeableParent;
-	public bool disarmed = false;
+
+	protected bool _isDisarmed = false;
+	public bool isDisarmed {
+		get {
+			return _isDisarmed;
+		}
+	}
 
 	public virtual void OnHoverEnter () {
 
@@ -20,5 +26,9 @@ public abstract class Defense : MonoBehaviour, ITriggerable {
 
 	public virtual void OnTrigger () {
 		
+	}
+
+	public virtual void Disarm () {
+		_isDisarmed = true;
 	}
 }

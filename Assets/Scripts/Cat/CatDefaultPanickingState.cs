@@ -305,11 +305,6 @@ public class CatDefaultPanickingState : CatPanickingState {
 	}
 
 	public override void ToLuredState () {
-		Debug.Log ("Entered lured state!");
-
-		_target = null;
-		StopCoroutines ();
-		
-		cat.currentState = cat.luredState;
+		// Can't be lured while panicking
 	}
 }

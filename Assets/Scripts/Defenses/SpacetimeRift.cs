@@ -19,7 +19,7 @@ public class SpacetimeRift :  Defense, IMultiTargeter {
 	void Update () {
 		if (placeableParent != null && !placeableParent.placed) return;
 
-		if (!disarmed) {
+		if (!_isDisarmed) {
 
 			if (cooldown > 0.0f) {
 				cooldown -= Time.deltaTime;
@@ -55,7 +55,7 @@ public class SpacetimeRift :  Defense, IMultiTargeter {
 	}
 
 	public void Activate () {
-		if (disarmed) return;
+		if (_isDisarmed) return;
 
 		for (int i = targets.Count - 1; i >= 0; i--) {
 			Cat enemy = targets [i];

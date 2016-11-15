@@ -16,8 +16,11 @@ public class CatFrozenStatusEffect : CatStatusEffect {
 	public override void End () {
 		if (cat.HasStatusEffect<CatFrozenStatusEffect> () <= 1) {
 			cat.animator.SetBool ("frozen", false);
-			cat.controller.frozen = false;
-			cat.SetTint (Color.white);
+
+			if (cat.HasStatusEffect<CatElectrocutedStatusEffect> () <= 1) {
+				cat.controller.frozen = false;
+				cat.SetTint (Color.white);
+			}
 		}
 	}
 }

@@ -155,6 +155,7 @@ public class PlayerController : MonoBehaviour {
 					GameManager.instance.cash -= _selected.cost;
 
 					_selected.HideHighlight ();
+					_selected.room = _currentRoom;
 					_selected.placed = true;
 					_selected.OnPlace ();
 					_selected = null;

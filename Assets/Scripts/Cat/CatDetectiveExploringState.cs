@@ -68,7 +68,7 @@ public class CatDetectiveExploringState : CatExploringState {
 		if (other.CompareTag ("Defense") && !_isTransitioning) {
 			Defense defense = other.GetComponentInChildren<Defense> ();
 
-			if (!defense.disarmed && (!canBeLured || !(defense is Lure))) {
+			if (defense != null && !defense.isDisarmed && (!canBeLured || !(defense is Lure))) {
 				// Disarm trap
 				cat.StartCoroutine (DisarmTrapCoroutine (defense, 1.0f));
 			}
@@ -85,7 +85,7 @@ public class CatDetectiveExploringState : CatExploringState {
 
 		yield return new WaitForSeconds (1.0f);
 
-		defense.disarmed = true;
+		defense.Disarm ();
 
 		yield return new WaitForSeconds (duration);
 

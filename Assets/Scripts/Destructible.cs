@@ -34,13 +34,17 @@ public class Destructible : MonoBehaviour {
 	public event DestroyedEventHandler onDestroyed;
 
 	public virtual void Damage (float amount, DamageType type = DamageType.Generic) {
-		health = Mathf.Clamp (health - amount, 0, maximumHealth);
+		if (!_isDead) {
+			health = Mathf.Clamp (health - amount, 0, maximumHealth);
 
-		if (amount > 0 && onDamaged != null) onDamaged (amount, type);
+			if (amount > 0 && onDamaged != null)
+				onDamaged (amount, type);
 
-		if (!_isDead && health <= 0.0f) {
-			if (onDestroyed != null) onDestroyed ();
-			_isDead = true;
+			if (health <= 0.0f) {
+				if (onDestroyed != null)
+					onDestroyed ();
+				_isDead = true;
+			}
 		}
 	}
 
@@ -57,8 +61,10 @@ public class Destructible : MonoBehaviour {
 	}
 
 	public virtual void Heal (float amount) {
-		health = Mathf.Clamp (health + amount, 0, maximumHealth);
+		if (!_isDead) {
+			health = Mathf.Clamp (health + amount, 0, maximumHealth);
 
-		if (amount > 0 && onHealed != null) onHealed (amount);
+			if (amount > 0 && onHealed != null) onHealed (amount);
+		}
 	}
 }

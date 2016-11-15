@@ -18,8 +18,8 @@ public class Placeable : MonoBehaviour {
 
 	[Space (10)]
 	public SpriteRenderer highlight;
-	public Color positiveHighlight = new Color (0.0f, 1.0f, 0.0f);
-	public Color negativeHighlight = new Color (1.0f, 0.0f, 0.0f);
+	public Color positiveHighlight = new Color (0.0f, 1.0f, 0.0f, 0.6f);
+	public Color negativeHighlight = new Color (1.0f, 0.0f, 0.0f, 0.6f);
 	public float transitionDuration = 0.2f;
 	private Coroutine transition = null;
 
@@ -38,6 +38,8 @@ public class Placeable : MonoBehaviour {
 		set { _placed = value; }
 	}
 
+	[HideInInspector] public Room room = null;
+
 	private Transform placementGrid;
 	private int _conflictCount = 0;
 
@@ -46,7 +48,7 @@ public class Placeable : MonoBehaviour {
 	}
 
 	public virtual bool CanBePlacedHere (int x, int y, int gridWidth, int gridHeight) {
-
+		
 		if (_conflictCount == 0) {
 			if (x == 0) {
 				// X = Left

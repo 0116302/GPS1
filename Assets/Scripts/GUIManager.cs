@@ -15,9 +15,37 @@ public class GUIManager : MonoBehaviour {
 		}
 	}
 
-	public Transform trapToolbar;
+	[Header ("Player")]
+	public PlayerController player;
+	public Room defaultRoom;
+
+	[Header ("Buttons")]
+	public Button startButton;
+	public Button shopButton;
+
+	[Header ("Shop")]
+	public GameObject shopWindow;
+	public Text shopPlayerCash;
+	public Image shopItemImage;
+	public Text shopItemName;
+	public Text shopItemDescription;
+	public Text shopItemPrice;
+	public Text shopItemAOE;
+	public Text shopItemDamageType;
+	public Text shopItemDamageRate;
+	public Text shopItemReusability;
+	public Text shopItemCooldown;
+	public Text shopItemPlacement;
+	GameObject shopSelectedPrefab = null;
+
+	public bool isShopOpen {
+		get {
+			return shopWindow.activeSelf;
+		}
+	}
+
+	[Header ("HUD")]
 	public Text roomNameDisplay;
-	public Text cashDisplay;
 	public Text enemyCountDisplay;
 	public Text winLoseDisplay;
 
@@ -30,8 +58,57 @@ public class GUIManager : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		cashDisplay.text = "$" + GameManager.instance.cash;
+		shopPlayerCash.text = "$" + GameManager.instance.cash;
 		enemyCountDisplay.text = "Enemies: " + GameManager.instance.enemiesLeft;
+	}
+
+	public void ShopOpen () {
+		if (player.playerMode == PlayerMode.Activation)
+			return;
+		
+		shopWindow.SetActive (true);
+		player.enabled = false;
+	}
+
+	public void ShopClose () {
+		shopWindow.SetActive (false);
+		player.enabled = true;
+	}
+
+	public void ShopToggle () {
+		if (isShopOpen) {
+			ShopClose ();
+		} else {
+			ShopOpen ();
+		}
+	}
+
+	public void ShopSelectItem (ShopEntry entry) {
+		shopItemImage.sprite = entry.image;
+		shopItemName.text = entry.name;
+		shopItemDescription.text = entry.description;
+		shopItemPrice.text = "$" + entry.price;
+		shopItemAOE.text = entry.areaOfEffect;
+		shopItemDamageType.text = entry.damageType;
+		shopItemDamageRate.text = entry.damageRate;
+		shopItemReusability.text = entry.reusability;
+		shopItemCooldown.text = entry.cooldown;
+		shopItemPlacement.text = entry.placement;
+		shopSelectedPrefab = entry.prefab;
+	}
+
+	public void ShopBuy () {
+		ShopClose ();
+
+		if (player.cameraMode != CameraMode.RoomView)
+			player.SwitchToRoomView (defaultRoom);
+		
+		player.EnterPlacementMode (shopSelectedPrefab);
+	}
+
+	public void ShopSell () {
+		ShopClose ();
+		player.EnterRemovalMode ();
 	}
 
 	// Update the GUI to match the room we are in
@@ -44,8 +121,11 @@ public class GUIManager : MonoBehaviour {
 	}
 
 	public void StartRaid () {
+		ShopClose ();
+		shopButton.interactable = false;
+		startButton.interactable = false;
+
 		GameManager.instance.StartRaid ();
-		trapToolbar.gameObject.SetActive(false);
 	}
 
 	public void Win () {
