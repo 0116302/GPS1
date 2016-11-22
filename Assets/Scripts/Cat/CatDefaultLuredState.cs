@@ -31,12 +31,10 @@ public class CatDefaultLuredState : CatLuredState {
 	}
 
 	IEnumerator ApproachTarget () {
-		Vector3 scale = cat.transform.localScale;
 
 		// Return to original Z position if necessary
 		if (cat.transform.position.z != cat.zPosition) {
-			scale.x = -scale.x;
-			cat.transform.localScale = scale;
+			cat.Flip ();
 
 			cat.controller.LockX ();
 			Vector3 pos = cat.transform.position;
@@ -79,20 +77,35 @@ public class CatDefaultLuredState : CatLuredState {
 		float deltaX = _target.transform.position.x - cat.transform.position.x;
 
 		if (deltaX > 0.0f) {
-			scale.x = Mathf.Abs (scale.x);
+			cat.FaceRight ();
 		} else if (deltaX < 0.0f) {
-			scale.x = -Mathf.Abs (scale.x);
+			cat.FaceLeft ();
 		}
 
-		cat.transform.localScale = scale;
+		int r = Random.Range (1, 5);
+		switch (r) {
+		case 1:
+			cat.Say ("What's a fine cat like you doing in a place like this?");
+			break;
+		case 2:
+			cat.Say ("Meeoww!");
+			break;
+		case 3:
+			cat.Say ("Rawrr!");
+			break;
+		case 4:
+			cat.Say ("Hey girl.");
+			break;
+		case 5:
+			cat.Say ("So... you come here often?");
+			break;
+		}
 
-		Debug.Log ("Staying at lure!");
 		while (_target.isActive) {
 			// Stay until the lure deactivates
 			yield return new WaitForSeconds (1.0f);
 		}
 
-		Debug.Log ("Moving from lure!");
 		ToProgressingState ();
 	}
 
@@ -117,8 +130,6 @@ public class CatDefaultLuredState : CatLuredState {
 	}
 
 	public override void ToProgressingState () {
-		Debug.Log ("Entered progressing state!");
-
 		_target = null;
 		cat.currentState = cat.progressingState;
 	}
@@ -128,8 +139,6 @@ public class CatDefaultLuredState : CatLuredState {
 	}
 
 	public override void ToPanickingState () {
-		Debug.Log ("Entered panicking state!");
-
 		_target = null;
 		cat.currentState = cat.panickingState;
 	}

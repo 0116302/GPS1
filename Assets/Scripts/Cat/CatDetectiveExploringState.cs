@@ -68,8 +68,28 @@ public class CatDetectiveExploringState : CatExploringState {
 		if (other.CompareTag ("Defense") && !_isTransitioning) {
 			Defense defense = other.GetComponentInChildren<Defense> ();
 
-			if (defense != null && !defense.isDisarmed && (!canBeLured || !(defense is Lure))) {
+			if (defense != null && defense.canBeDisarmed && !defense.isDisarmed && (!canBeLured || !(defense is Lure))) {
 				// Disarm trap
+
+				int r = Random.Range (1, 5);
+				switch (r) {
+				case 1:
+					cat.Say ("Is anyone gonna fall for this?");
+					break;
+				case 2:
+					cat.Say ("Nice try amigo!");
+					break;
+				case 3:
+					cat.Say ("Not on my watch!");
+					break;
+				case 4:
+					cat.Say ("I'm just gonna unplug this right here.");
+					break;
+				case 5:
+					cat.Say ("Off you go!");
+					break;
+				}
+
 				cat.StartCoroutine (DisarmTrapCoroutine (defense, 1.0f));
 			}
 
@@ -102,8 +122,6 @@ public class CatDetectiveExploringState : CatExploringState {
 	}
 
 	public override void ToProgressingState () {
-		Debug.Log ("Entered progressing state!");
-
 		targetDetermined = false;
 		StopCoroutines ();
 
@@ -111,8 +129,6 @@ public class CatDetectiveExploringState : CatExploringState {
 	}
 
 	public override void ToPanickingState () {
-		Debug.Log ("Entered panicking state!");
-
 		targetDetermined = false;
 		StopCoroutines ();
 
@@ -121,8 +137,6 @@ public class CatDetectiveExploringState : CatExploringState {
 
 	public override void ToLuredState () {
 		if (canBeLured) {
-			Debug.Log ("Entered lured state!");
-
 			targetDetermined = false;
 			StopCoroutines ();
 

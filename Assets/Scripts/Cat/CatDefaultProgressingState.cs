@@ -56,14 +56,12 @@ public class CatDefaultProgressingState : CatProgressingState {
 		// The cat has reached its target
 
 		if (_target != null && !_isEnteringStaircase && !_isRetargeting) {
-			Debug.Log ("Target reached!");
 			// The cat has a valid target
 
 			if (_target.isStaircase) {
 				// Target is a staircase
 
 				enteringStaircaseCoroutine = cat.StartCoroutine (EnteringStaircaseCoroutine ());
-				Debug.Log ("Entering staircase!");
 
 			} else {
 				// Target is a regular room door
@@ -72,12 +70,10 @@ public class CatDefaultProgressingState : CatProgressingState {
 				EvaluateRoom (cat.currentRoom);
 
 				if (GetRoomStatus (cat.currentRoom).visitCount <= 1) {
-					Debug.Log ("Exploring room for the first time!");
 					// First time in this room, explore it
 					ToExploringState ();
 
 				} else {
-					Debug.Log ("Been here before!");
 					// Been here before, just move on
 					retargetingCoroutine = cat.StartCoroutine (RetargetCoroutine ());
 				}
@@ -166,7 +162,6 @@ public class CatDefaultProgressingState : CatProgressingState {
 		}
 
 		if (validPaths <= 1) {
-			Debug.Log ("This room is a dead end!");
 			status.isDeadEnd = true;
 		}
 		
@@ -191,9 +186,7 @@ public class CatDefaultProgressingState : CatProgressingState {
 		_isEnteringStaircase = true;
 
 		// Flip
-		Vector3 scale = cat.transform.localScale;
-		scale.x = -scale.x;
-		cat.transform.localScale = scale;
+		cat.Flip ();
 
 		// Walk in
 		cat.controller.LockX ();
@@ -215,8 +208,7 @@ public class CatDefaultProgressingState : CatProgressingState {
 		cat.transform.position = _target.destination.teleportPosition.position;
 
 		// Flip
-		scale.x = -scale.x;
-		cat.transform.localScale = scale;
+		cat.Flip ();
 
 		// Fade in
 		yield return cat.StartCoroutine (cat.Fade (1.0f, 0.5f));
@@ -258,7 +250,6 @@ public class CatDefaultProgressingState : CatProgressingState {
 			_isEnteringStaircase = false;
 		}
 
-		Debug.Log ("Retargeting!");
 		Door oldTarget = _target;
 		_target = null;
 
@@ -323,8 +314,6 @@ public class CatDefaultProgressingState : CatProgressingState {
 	}
 
 	public override void ToExploringState () {
-		Debug.Log ("Entered exploring state!");
-
 		_target = null;
 		StopCoroutines ();
 
@@ -332,8 +321,6 @@ public class CatDefaultProgressingState : CatProgressingState {
 	}
 
 	public override void ToPanickingState () {
-		Debug.Log ("Entered panicking state!");
-
 		_target = null;
 		StopCoroutines ();
 
@@ -341,8 +328,6 @@ public class CatDefaultProgressingState : CatProgressingState {
 	}
 
 	public override void ToLuredState () {
-		Debug.Log ("Entered lured state!");
-
 		_target = null;
 		StopCoroutines ();
 		

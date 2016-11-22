@@ -16,7 +16,7 @@ public class Fire : MonoBehaviour {
 		if (enabled && other.CompareTag ("Enemy")) {
 			Cat enemy = other.GetComponent<Cat> ();
 
-			if (!burnt.Contains (enemy)) {
+			if (!burnt.Contains (enemy) && enemy.HasStatusEffect<CatBurningStatusEffect> () == 0) {
 				enemy.AddStatusEffect (new CatBurningStatusEffect (burnDuration));
 				burnt.Add (enemy);
 			}

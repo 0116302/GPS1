@@ -9,8 +9,6 @@ public class Cat : Destructible {
 	public float panickingSpeed = 2.0f;
 	public float enteringStaircaseMultiplier = 1.25f;
 
-	public TextMesh healthDisplay; //TODO Replace this
-
 	[HideInInspector] public float zPosition = 0.0f;
 
 	[HideInInspector] public Animator animator;
@@ -37,6 +35,11 @@ public class Cat : Destructible {
 	public SpriteRenderer rightFoot;
 	public SpriteRenderer tail;
 
+	[Space (10)]
+	public TextMesh healthDisplay; //TODO Replace this
+	public Transform speechOrigin;
+	public GameObject speechPrefab;
+
 	[Header ("Drops")]
 	public GameObject decapitatedHeadPrefab;
 
@@ -49,13 +52,13 @@ public class Cat : Destructible {
 
 	public bool isFacingLeft {
 		get {
-			return transform.localScale.x < 0;
+			return pelvis.transform.localScale.x < 0;
 		}
 	}
 
 	public bool isFacingRight {
 		get {
-			return transform.localScale.x > 0;
+			return pelvis.transform.localScale.x > 0;
 		}
 	}
 
@@ -143,6 +146,30 @@ public class Cat : Destructible {
 	}
 
 	// Methods
+
+	public void FaceLeft () {
+		Vector3 scale = pelvis.transform.localScale;
+		scale.x = -Mathf.Abs (scale.x);
+		pelvis.transform.localScale = scale;
+	}
+
+	public void FaceRight () {
+		Vector3 scale = pelvis.transform.localScale;
+		scale.x = Mathf.Abs (scale.x);
+		pelvis.transform.localScale = scale;
+	}
+
+	public void Flip () {
+		Vector3 scale = pelvis.transform.localScale;
+		scale.x = -scale.x;
+		pelvis.transform.localScale = scale;
+	}
+
+	public void Say (string message) {
+		FadingText text = ((GameObject)Instantiate (speechPrefab, speechOrigin.position, speechOrigin.rotation)).GetComponent<FadingText> ();
+		text.SetText (message);
+		text.transform.parent = transform;
+	}
 
 	public void AddStatusEffect (CatStatusEffect effect) {
 		effect.Attach (this);

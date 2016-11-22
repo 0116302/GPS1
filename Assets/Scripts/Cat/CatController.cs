@@ -3,6 +3,7 @@ using System.Collections;
 
 public class CatController : MonoBehaviour {
 
+	public Cat cat;
 	Animator animator;
 	new Rigidbody rigidbody;
 
@@ -32,9 +33,9 @@ public class CatController : MonoBehaviour {
 	public delegate void TargetReachedEventHandler();
 	public event TargetReachedEventHandler onTargetReached;
 
-	void Awake () {
-		animator = GetComponent<Animator> ();
-		rigidbody = GetComponent<Rigidbody> ();
+	void Start () {
+		animator = cat.animator;
+		rigidbody = cat.rigidbody;
 	}
 
 	void FixedUpdate () {
@@ -60,14 +61,11 @@ public class CatController : MonoBehaviour {
 					rigidbody.velocity = velocity;
 					animator.SetFloat ("movementSpeed", movementSpeed);
 
-					Vector3 scale = transform.localScale;
-
 					if (movement.x > 0.0f)
-						scale.x = Mathf.Abs (scale.x);
+						cat.FaceRight ();
 					else if (movement.x < 0.0f)
-						scale.x = -Mathf.Abs (scale.x);
-
-					transform.localScale = scale;
+						cat.FaceLeft ();
+					
 				}
 
 			} else if (transform.position == _target) {

@@ -69,8 +69,6 @@ public class CatDefaultExploringState : CatExploringState {
 	}
 
 	public override void ToProgressingState () {
-		Debug.Log ("Entered progressing state!");
-
 		targetDetermined = false;
 		StopCoroutines ();
 
@@ -78,8 +76,6 @@ public class CatDefaultExploringState : CatExploringState {
 	}
 
 	public override void ToPanickingState () {
-		Debug.Log ("Entered panicking state!");
-
 		targetDetermined = false;
 		StopCoroutines ();
 
@@ -87,8 +83,6 @@ public class CatDefaultExploringState : CatExploringState {
 	}
 
 	public override void ToLuredState () {
-		Debug.Log ("Entered lured state!");
-
 		targetDetermined = false;
 		StopCoroutines ();
 

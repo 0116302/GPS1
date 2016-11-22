@@ -5,6 +5,8 @@ public abstract class Defense : MonoBehaviour, ITriggerable {
 
 	public Placeable placeableParent;
 
+	public bool canBeDisarmed = true;
+
 	protected bool _isDisarmed = false;
 	public bool isDisarmed {
 		get {
@@ -29,6 +31,6 @@ public abstract class Defense : MonoBehaviour, ITriggerable {
 	}
 
 	public virtual void Disarm () {
-		_isDisarmed = true;
+		if (canBeDisarmed) _isDisarmed = true;
 	}
 }

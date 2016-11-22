@@ -315,6 +315,7 @@ public class PlayerController : MonoBehaviour {
 	public void EnterRemovalMode () {
 		if (GameManager.instance.gamePhase != GamePhase.Setup) return; // Can't enter removal mode unless in setup phase
 		if (_cameraMode == CameraMode.Overview) return; // Can't enter removal mode while in overview
+		if (_currentRoom == null || !_currentRoom.canPlaceDefenses) return; // Can't enter removal mode in rooms that don't allow it
 
 		if (_playerMode != PlayerMode.Placement && _playerMode != PlayerMode.Removal) _currentRoom.fadeInGrid (gridFadeDuration);
 		if (_selected != null) {

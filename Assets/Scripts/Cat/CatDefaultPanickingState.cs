@@ -165,9 +165,7 @@ public class CatDefaultPanickingState : CatPanickingState {
 		_isEnteringStaircase = true;
 
 		// Flip
-		Vector3 scale = cat.transform.localScale;
-		scale.x = -scale.x;
-		cat.transform.localScale = scale;
+		cat.Flip ();
 
 		// Walk in
 		cat.controller.LockX ();
@@ -189,8 +187,7 @@ public class CatDefaultPanickingState : CatPanickingState {
 		cat.transform.position = _target.destination.teleportPosition.position;
 
 		// Flip
-		scale.x = -scale.x;
-		cat.transform.localScale = scale;
+		cat.Flip ();
 
 		// Fade in
 		yield return cat.StartCoroutine (cat.Fade (1.0f, 0.5f));

@@ -59,14 +59,12 @@ public class CatDetectiveProgressingState : CatProgressingState {
 		// The cat has reached its target
 
 		if (_target != null && !_isEnteringStaircase && !_isRetargeting) {
-			Debug.Log ("Target reached!");
 			// The cat has a valid target
 
 			if (_target.isStaircase) {
 				// Target is a staircase
 
 				enteringStaircaseCoroutine = cat.StartCoroutine (EnteringStaircaseCoroutine ());
-				Debug.Log ("Entering staircase!");
 
 			} else {
 				// Target is a regular room door
@@ -75,12 +73,10 @@ public class CatDetectiveProgressingState : CatProgressingState {
 				EvaluateRoom (cat.currentRoom);
 
 				if (GetRoomStatus (cat.currentRoom).visitCount <= 1) {
-					Debug.Log ("Exploring room for the first time!");
 					// First time in this room, explore it
 					ToExploringState ();
 
 				} else {
-					Debug.Log ("Been here before!");
 					// Been here before, just move on
 					retargetingCoroutine = cat.StartCoroutine (RetargetCoroutine ());
 				}
@@ -169,7 +165,6 @@ public class CatDetectiveProgressingState : CatProgressingState {
 		}
 
 		if (validPaths <= 1) {
-			Debug.Log ("This room is a dead end!");
 			status.isDeadEnd = true;
 		}
 		
@@ -193,8 +188,28 @@ public class CatDetectiveProgressingState : CatProgressingState {
 		if (other.CompareTag ("Defense") && !_isEnteringStaircase && !_isRetargeting) {
 			Defense defense = other.GetComponentInChildren<Defense> ();
 
-			if (defense != null && !defense.isDisarmed && (!canBeLured || !(defense is Lure))) {
+			if (defense != null && defense.canBeDisarmed && !defense.isDisarmed && (!canBeLured || !(defense is Lure))) {
 				// Disarm trap
+
+				int r = Random.Range (1, 5);
+				switch (r) {
+				case 1:
+					cat.Say ("Is anyone gonna fall for this?");
+					break;
+				case 2:
+					cat.Say ("Nice try amigo!");
+					break;
+				case 3:
+					cat.Say ("Not on my watch!");
+					break;
+				case 4:
+					cat.Say ("I'm just gonna unplug this right here.");
+					break;
+				case 5:
+					cat.Say ("Off you go!");
+					break;
+				}
+
 				cat.StartCoroutine (DisarmTrapCoroutine (defense, 1.0f));
 			}
 
@@ -224,9 +239,7 @@ public class CatDetectiveProgressingState : CatProgressingState {
 		_isEnteringStaircase = true;
 
 		// Flip
-		Vector3 scale = cat.transform.localScale;
-		scale.x = -scale.x;
-		cat.transform.localScale = scale;
+		cat.Flip ();
 
 		// Walk in
 		cat.controller.LockX ();
@@ -248,8 +261,7 @@ public class CatDetectiveProgressingState : CatProgressingState {
 		cat.transform.position = _target.destination.teleportPosition.position;
 
 		// Flip
-		scale.x = -scale.x;
-		cat.transform.localScale = scale;
+		cat.Flip ();
 
 		// Fade in
 		yield return cat.StartCoroutine (cat.Fade (1.0f, 0.5f));
@@ -291,7 +303,6 @@ public class CatDetectiveProgressingState : CatProgressingState {
 			_isEnteringStaircase = false;
 		}
 
-		Debug.Log ("Retargeting!");
 		Door oldTarget = _target;
 		_target = null;
 
@@ -356,8 +367,6 @@ public class CatDetectiveProgressingState : CatProgressingState {
 	}
 
 	public override void ToExploringState () {
-		Debug.Log ("Entered exploring state!");
-
 		_target = null;
 		StopCoroutines ();
 
@@ -365,8 +374,6 @@ public class CatDetectiveProgressingState : CatProgressingState {
 	}
 
 	public override void ToPanickingState () {
-		Debug.Log ("Entered panicking state!");
-
 		_target = null;
 		StopCoroutines ();
 
@@ -375,8 +382,6 @@ public class CatDetectiveProgressingState : CatProgressingState {
 
 	public override void ToLuredState () {
 		if (canBeLured) {
-			Debug.Log ("Entered lured state!");
-
 			_target = null;
 			StopCoroutines ();
 

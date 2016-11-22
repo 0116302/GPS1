@@ -6,6 +6,8 @@ public class AcidDropPayload : MonoBehaviour {
 	public float explosionRadius = 1.5f;
 	public int particleCount = 10;
 
+	bool exploded = false;
+
 	new SpriteRenderer renderer;
 	public new ParticleSystem particleSystem;
 
@@ -15,7 +17,10 @@ public class AcidDropPayload : MonoBehaviour {
 	}
 
 	void OnCollisionEnter (Collision collision) {
-		StartCoroutine (Explosion ());
+		if (!exploded) {
+			StartCoroutine (Explosion ());
+			exploded = true;
+		}
 	}
 
 	IEnumerator Explosion () {
