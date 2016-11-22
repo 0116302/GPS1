@@ -96,7 +96,7 @@ public class Hologram : Lure, IMultiTargeter {
 	public override void OnTrigger () {
 		if (cooldown <= 0.0f) {
 			Activate ();
-
+			GetComponent<SFX> ().Play ();
 			cooldown = cooldownDuration;
 		}
 	}

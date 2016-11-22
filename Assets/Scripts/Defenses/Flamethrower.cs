@@ -61,7 +61,7 @@ public class Flamethrower : Defense, ITargeter {
 	public override void OnTrigger () {
 		if (cooldown <= 0.0f) {
 			StartCoroutine (Fire ());
-
+			GetComponent<SFX> ().Play ();
 			cooldown = cooldownDuration;
 		}
 	}

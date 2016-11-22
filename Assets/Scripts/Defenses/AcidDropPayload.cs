@@ -15,6 +15,7 @@ public class AcidDropPayload : MonoBehaviour {
 	}
 
 	void OnCollisionEnter (Collision collision) {
+		GetComponent<SFX> ().Play ();
 		StartCoroutine (Explosion ());
 	}
 

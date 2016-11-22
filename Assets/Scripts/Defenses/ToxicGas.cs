@@ -55,7 +55,7 @@ public class ToxicGas :  Defense {
 	public override void OnTrigger () {
 		if (!used) {
 			Activate ();
-
+			GetComponent<SFX> ().Play ();
 			used = true;
 			if (cooldownIndicator != null) {
 				cooldownIndicator.value = 1.0f;

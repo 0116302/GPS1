@@ -50,7 +50,8 @@ public class Door : MonoBehaviour, ITriggerable {
 			}
 
 			if (cooldown <= cooldownDuration - closeDuration) {
-				Open ();
+				if(_isOpen == false)
+					Open ();
 			}
 
 		} else {
@@ -90,11 +91,16 @@ public class Door : MonoBehaviour, ITriggerable {
 	public void Open () {
 		animator.SetBool ("isOpen", true);
 		_isOpen = true;
+		DoorSFX doorSFX = GetComponent<DoorSFX> ();
+		if (doorSFX != null) {
+			doorSFX.Play ();
+		}
 	}
 
 	public void Close () {
 		animator.SetBool ("isOpen", false);
 		_isOpen = false;
+		GetComponent<DoorSFX> ().Play ();
 	}
 
 	public void Toggle () {

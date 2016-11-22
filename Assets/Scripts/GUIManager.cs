@@ -2,6 +2,7 @@
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using System.Collections;
+using System.Collections.Generic;
 
 public class GUIManager : MonoBehaviour {
 
@@ -41,6 +42,18 @@ public class GUIManager : MonoBehaviour {
 	public bool isShopOpen {
 		get {
 			return shopWindow.activeSelf;
+		}
+	}
+
+	[Header ("Setting")]
+	public GameObject settingWindow;
+	public VolumeSetting masterVolume;
+	public VolumeSetting soundVolume;
+	public VolumeSetting musicVolume;
+
+	public bool isSettingOpen{
+		get{
+			return settingWindow.activeSelf;
 		}
 	}
 
@@ -111,6 +124,35 @@ public class GUIManager : MonoBehaviour {
 		player.EnterRemovalMode ();
 	}
 
+	#region setting
+	public void SettingOpen(){
+		settingWindow.SetActive (true);
+		player.enabled = false;
+		Time.timeScale = 0.0f;
+	}
+	public void SettingClose(){
+		settingWindow.SetActive (false);
+		player.enabled = true;
+		masterVolume.OnExit ();
+		soundVolume.OnExit ();
+		musicVolume.OnExit ();
+		Time.timeScale = 1.0f;
+	}
+	public void SettingToggle(){
+		AudioSource[] ar = FindObjectsOfType<AudioSource>();
+		if (isSettingOpen) {
+			SettingClose ();
+			foreach (AudioSource a in ar) {
+				a.UnPause ();
+			}
+		} else {
+			SettingOpen ();
+			foreach (AudioSource a in ar) {
+				a.Pause ();
+			}
+		}
+	}
+	#endregion
 	// Update the GUI to match the room we are in
 	public void SwitchToRoom (Room room) {
 		roomNameDisplay.text = room.roomName;
@@ -126,6 +168,7 @@ public class GUIManager : MonoBehaviour {
 		startButton.interactable = false;
 
 		GameManager.instance.StartRaid ();
+		BGMManager.instance.Play ();
 	}
 
 	public void Win () {

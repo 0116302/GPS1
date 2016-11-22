@@ -127,7 +127,7 @@ public class Cat : Destructible {
 		foreach (CatStatusEffect effect in statusEffects) {
 			StopCoroutine (effect.coroutine);
 		}
-
+		GetComponent<CatSFX> ().PlayDeath ();
 		// Head popping off
 		Rigidbody decapitatedHead = ((GameObject) GameObject.Instantiate (decapitatedHeadPrefab, head.transform.position, head.transform.rotation)).GetComponent<Rigidbody> ();
 		decapitatedHead.AddForce (new Vector3(-0.5f, 2f, 0f), ForceMode.Impulse);

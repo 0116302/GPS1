@@ -32,7 +32,6 @@ public class AcidDrop :  Defense {
 	public override void OnTrigger () {
 		if (!used) {
 			Activate ();
-
 			used = true;
 			if (cooldownIndicator != null) {
 				cooldownIndicator.value = 1.0f;

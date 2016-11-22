@@ -82,7 +82,7 @@ public class ElectricCarpet : Defense, IMultiTargeter {
 
 	public void Activate () {
 		if (isDisarmed) return;
-
+		GetComponent<SFX> ().Play ();
 		_isActive = true;
 		activeTime = activeDuration;
 
