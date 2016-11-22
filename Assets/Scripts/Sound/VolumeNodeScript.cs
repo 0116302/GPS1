@@ -22,10 +22,9 @@ public class VolumeNodeScript : MonoBehaviour {
 		if (Input.GetMouseButton (0)) {
 			ChangeNode ();
 		}
-		if (Input.GetMouseButtonUp (0)) {
-			PlayAdjusVolume ();
-			Debug.Log ("hello");
-		}
+//		if (Input.GetMouseButtonUp (0)) {
+//			PlayAdjusVolume ();
+//		}
 	}
 
 	public void ChangeNode(){
