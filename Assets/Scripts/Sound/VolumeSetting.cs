@@ -49,6 +49,7 @@ public class VolumeSetting : MonoBehaviour {
 			float temp = volume * 10f;
 			int node = int.Parse (temp.ToString ());
 			listVolumeNode [node-1].ChangeNode ();
+			listVolumeNode [node-1].PlayAdjusVolume ();
 		}
 	}
 
@@ -60,6 +61,7 @@ public class VolumeSetting : MonoBehaviour {
 			float temp = volume * 10f;
 			int node = int.Parse(temp.ToString ());
 			listVolumeNode [node-1].ChangeNode ();
+			listVolumeNode [node-1].PlayAdjusVolume ();
 		}
 	}
 }
