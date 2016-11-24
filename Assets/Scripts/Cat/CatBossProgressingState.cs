@@ -173,7 +173,7 @@ public class CatBossProgressingState : CatProgressingState {
 		if (collision.gameObject.CompareTag ("Door") && !_isBreakingDoor) {
 			
 			Vector3 normal = collision.contacts[0].normal;
-			if ((normal.x < 0 && cat.transform.localScale.x > 0) || (normal.x > 0 && cat.transform.localScale.x < 0) || (normal.z < 0)) {
+			if ((normal.x < 0 && cat.isFacingRight) || (normal.x > 0 && cat.isFacingLeft) || (normal.z < 0)) {
 				// Kick open doors in the way like a boss
 				cat.StartCoroutine (BreakDoorCoroutine (collision.gameObject.GetComponentInParent<Door> (), 0.5f, 1.0f));
 			}
@@ -291,9 +291,7 @@ public class CatBossProgressingState : CatProgressingState {
 		// Return to original Z position if necessary
 		if (cat.transform.position.z != cat.zPosition && !(_target.isStaircase && cat.transform.position.x == _target.teleportPosition.position.x)) {
 
-			Vector3 scale = cat.transform.localScale;
-			scale.x = -scale.x;
-			cat.transform.localScale = scale;
+			cat.Flip ();
 
 			cat.controller.LockX ();
 			Vector3 pos = cat.transform.position;

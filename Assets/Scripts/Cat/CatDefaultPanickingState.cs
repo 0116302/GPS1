@@ -77,14 +77,12 @@ public class CatDefaultPanickingState : CatPanickingState {
 		// The cat has reached its target
 
 		if (_target != null && !_isEnteringStaircase && !_isRetargeting) {
-			Debug.Log ("PANIC: Target reached!");
 			// The cat has a valid target
 
 			if (_target.isStaircase) {
 				// Target is a staircase
 
 				enteringStaircaseCoroutine = cat.StartCoroutine (EnteringStaircaseCoroutine ());
-				Debug.Log ("PANIC: Entering staircase!");
 
 			} else {
 				// Target is a regular room door
@@ -100,8 +98,6 @@ public class CatDefaultPanickingState : CatPanickingState {
 
 	void DetermineTarget () {
 		if (cat.currentRoom == null) return;
-
-		Debug.Log ("PANIC: Determining next target!");
 
 		List<DoorOption> options = new List<DoorOption> ();
 
@@ -152,7 +148,7 @@ public class CatDefaultPanickingState : CatPanickingState {
 		if (collision.gameObject.CompareTag ("Door") && !_isRetargeting) {
 			
 			Vector3 normal = collision.contacts[0].normal;
-			if ((normal.x < 0 && cat.transform.localScale.x > 0) || (normal.x > 0 && cat.transform.localScale.x < 0) || (normal.z < 0)) {
+			if ((normal.x < 0 && cat.isFacingRight) || (normal.x > 0 && cat.isFacingLeft) || (normal.z < 0)) {
 				// Find a new target if current destination is suddenly blocked by a door
 				retargetingCoroutine = cat.StartCoroutine (RetargetCoroutine (2.0f, true));
 			}
@@ -224,7 +220,6 @@ public class CatDefaultPanickingState : CatPanickingState {
 			_isEnteringStaircase = false;
 		}
 
-		Debug.Log ("PANIC: Retargeting!");
 		Door oldTarget = _target;
 		_target = null;
 
@@ -248,9 +243,7 @@ public class CatDefaultPanickingState : CatPanickingState {
 		// Return to original Z position if necessary
 		if (cat.transform.position.z != cat.zPosition && !(_target.isStaircase && cat.transform.position.x == _target.teleportPosition.position.x)) {
 
-			Vector3 scale = cat.transform.localScale;
-			scale.x = -scale.x;
-			cat.transform.localScale = scale;
+			cat.Flip ();
 
 			cat.controller.LockX ();
 			Vector3 pos = cat.transform.position;
