@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 public class Fire : MonoBehaviour {
 
-	public float burnDuration = 40.0f;
+	public float burnDuration = 4.0f;
 
 	HashSet<Cat> burnt = new HashSet<Cat> ();
 

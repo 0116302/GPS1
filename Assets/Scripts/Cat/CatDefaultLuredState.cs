@@ -73,32 +73,34 @@ public class CatDefaultLuredState : CatLuredState {
 			yield return null;
 		}
 
-		// Flip the cat to face the lure
-		float deltaX = _target.transform.position.x - cat.transform.position.x;
+		if (_target.isActive) {
+			// Flip the cat to face the lure
+			float deltaX = _target.transform.position.x - cat.transform.position.x;
 
-		if (deltaX > 0.0f) {
-			cat.FaceRight ();
-		} else if (deltaX < 0.0f) {
-			cat.FaceLeft ();
-		}
+			if (deltaX > 0.0f) {
+				cat.FaceRight ();
+			} else if (deltaX < 0.0f) {
+				cat.FaceLeft ();
+			}
 
-		int r = Random.Range (1, 5);
-		switch (r) {
-		case 1:
-			cat.Say ("What's a fine cat like you doing in a place like this?");
-			break;
-		case 2:
-			cat.Say ("Meeoww!");
-			break;
-		case 3:
-			cat.Say ("Rawrr!");
-			break;
-		case 4:
-			cat.Say ("Hey girl.");
-			break;
-		case 5:
-			cat.Say ("So... you come here often?");
-			break;
+			int r = Random.Range (1, 5);
+			switch (r) {
+			case 1:
+				cat.Say ("What's a fine cat like you doing in a place like this?");
+				break;
+			case 2:
+				cat.Say ("Meeoww!");
+				break;
+			case 3:
+				cat.Say ("Rawrr!");
+				break;
+			case 4:
+				cat.Say ("Hey girl.");
+				break;
+			case 5:
+				cat.Say ("So... you come here often?");
+				break;
+			}
 		}
 
 		while (_target.isActive) {

@@ -152,7 +152,7 @@ public class PlayerController : MonoBehaviour {
 				}
 
 				if (Input.GetButtonDown ("Interact") && _selected != null && _canPlace) {
-					GameManager.instance.cash -= _selected.cost;
+					LevelManager.instance.cash -= _selected.cost;
 
 					_selected.HideHighlight ();
 					_selected.room = _currentRoom;
@@ -192,7 +192,7 @@ public class PlayerController : MonoBehaviour {
 				if (Input.GetButtonDown ("Interact") && _selected != null) {
 					if (_selected.removable) {
 						if (_selected.refundable)
-							GameManager.instance.cash += _selected.cost;
+							LevelManager.instance.cash += _selected.cost;
 
 						_selected.OnRemove ();
 
@@ -291,7 +291,7 @@ public class PlayerController : MonoBehaviour {
 	}
 
 	public void EnterPlacementMode (GameObject placeableObject) {
-		if (GameManager.instance.gamePhase != GamePhase.Setup) return; // Can't enter placement mode unless in setup phase
+		if (LevelManager.instance.gamePhase != GamePhase.Setup) return; // Can't enter placement mode unless in setup phase
 		if (_cameraMode == CameraMode.Overview) return; // Can't enter placement mode while in overview
 		if (_currentRoom == null || !_currentRoom.canPlaceDefenses) return; // Can't enter placement mode in rooms that don't allow it
 
@@ -300,7 +300,7 @@ public class PlayerController : MonoBehaviour {
 		}
 
 		Placeable template;
-		if ((template = placeableObject.GetComponent<Placeable> ()) != null && GameManager.instance.cash >= template.cost) {
+		if ((template = placeableObject.GetComponent<Placeable> ()) != null && LevelManager.instance.cash >= template.cost) {
 
 			GameObject instance = GameObject.Instantiate (placeableObject);
 			_selected = instance.GetComponent<Placeable> ();
@@ -313,7 +313,7 @@ public class PlayerController : MonoBehaviour {
 	}
 
 	public void EnterRemovalMode () {
-		if (GameManager.instance.gamePhase != GamePhase.Setup) return; // Can't enter removal mode unless in setup phase
+		if (LevelManager.instance.gamePhase != GamePhase.Setup) return; // Can't enter removal mode unless in setup phase
 		if (_cameraMode == CameraMode.Overview) return; // Can't enter removal mode while in overview
 		if (_currentRoom == null || !_currentRoom.canPlaceDefenses) return; // Can't enter removal mode in rooms that don't allow it
 

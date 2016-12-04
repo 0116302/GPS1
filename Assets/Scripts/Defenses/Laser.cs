@@ -9,6 +9,7 @@ public class Laser : Defense, ITargeter {
 	public float damage = 1.0f;
 
 	private LineRenderer lineRenderer;
+	SoundEffect sound;
 
 	private Transform _target;
 	public Transform target {
@@ -23,6 +24,7 @@ public class Laser : Defense, ITargeter {
 
 	void Awake () {
 		lineRenderer = GetComponent<LineRenderer> ();
+		sound = GetComponent<SoundEffect> ();
 	}
 
 	// Update is called once per frame
@@ -78,6 +80,7 @@ public class Laser : Defense, ITargeter {
 			laserEnd -= laserOrigin.up * 0.25f;
 			lineRenderer.SetPosition (1, laserEnd);
 			lineRenderer.enabled = true;
+			if (sound != null) sound.Play (0);
 
 			if (hit.collider.CompareTag ("Enemy")) {
 				hit.collider.GetComponent<Cat> ().Damage(damage, DamageType.Heat);

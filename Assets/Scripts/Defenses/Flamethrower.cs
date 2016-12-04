@@ -6,6 +6,7 @@ public class Flamethrower : Defense, ITargeter {
 	public Transform flame;
 	Fire damageRegion;
 	new ParticleSystem particleSystem;
+	SoundEffect sound;
 
 	private Transform _target;
 	public Transform target {
@@ -22,6 +23,7 @@ public class Flamethrower : Defense, ITargeter {
 	void Awake () {
 		damageRegion = flame.GetComponent<Fire> ();
 		particleSystem = flame.GetComponent<ParticleSystem> ();
+		sound = GetComponent<SoundEffect> ();
 	}
 
 	// Update is called once per frame
@@ -55,7 +57,10 @@ public class Flamethrower : Defense, ITargeter {
 	}
 
 	public void SetTarget (Transform target) {
-		_target = target;
+		Cat cat = target.GetComponent<Cat> ();
+		if (cat != null && cat.currentRoom == placeableParent.room) {
+			_target = target;
+		}
 	}
 
 	public override void OnTrigger () {
@@ -69,6 +74,7 @@ public class Flamethrower : Defense, ITargeter {
 	IEnumerator Fire () {
 		if (damageRegion != null) damageRegion.enabled = true;
 		if (particleSystem != null) particleSystem.Play ();
+		if (sound != null) sound.Play (0);
 
 		yield return new WaitForSeconds (fireDuration);
 

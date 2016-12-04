@@ -36,12 +36,15 @@ public class Cat : Destructible {
 	public SpriteRenderer tail;
 
 	[Space (10)]
-	public TextMesh healthDisplay; //TODO Replace this
+	public TextMesh healthDisplay;
+	public int heartCount = 3;
 	public Transform speechOrigin;
 	public GameObject speechPrefab;
 
-	[Header ("Drops")]
+	[Header ("Death")]
+	public int headValue = 100;
 	public GameObject decapitatedHeadPrefab;
+	public GameObject deathEffectPrefab;
 
 	[HideInInspector] public bool flashOnDamage = true;
 
@@ -82,14 +85,14 @@ public class Cat : Destructible {
 		onDamaged += OnDamaged;
 		onDestroyed += OnDestroyed;
 
-		// Randomize position on the Z axis to prevent overlapping with parts of other cats
-		//TODO Improve this to reduce overlap even more
-		Vector3 position = transform.position;
-		position.z = 0.02f * Random.Range (-5, 5);
-		transform.position = position;
-		zPosition = position.z;
+		// Randomize position on the Z axis to reduce overlapping with parts of other cats
+		zPosition = 0.02f * Random.Range (-5, 5);
 
 		AssignStates ();
+
+		if (healthDisplay != null) {
+			healthDisplay.text = new string ('♥', Mathf.CeilToInt(this.health / this.maximumHealth * heartCount));
+		}
 	}
 
 	protected virtual void AssignStates () {
@@ -121,26 +124,36 @@ public class Cat : Destructible {
 		}
 
 		if (healthDisplay != null) {
-			healthDisplay.text = new string ('♥', Mathf.CeilToInt(this.health / this.maximumHealth * 3.0f));
+			healthDisplay.text = new string ('♥', Mathf.CeilToInt(this.health / this.maximumHealth * heartCount));
 		}
 	}
 
 	void OnDestroyed () {
+		// Update the number of enemies left
+		LevelManager.instance.enemiesLeft--;
+		if (LevelManager.instance.enemiesLeft == 0) {
+			LevelManager.instance.Win ();
+		}
+
 		// Stop all status effect coroutines
 		foreach (CatStatusEffect effect in statusEffects) {
 			StopCoroutine (effect.coroutine);
 		}
 
+		// Death effect
+		GameObject.Instantiate (deathEffectPrefab, transform.position, deathEffectPrefab.transform.rotation);
+
 		// Head popping off
 		Rigidbody decapitatedHead = ((GameObject) GameObject.Instantiate (decapitatedHeadPrefab, head.transform.position, head.transform.rotation)).GetComponent<Rigidbody> ();
-		decapitatedHead.AddForce (new Vector3(-0.5f, 2f, 0f), ForceMode.Impulse);
+
+		Vector3 scale = decapitatedHead.transform.localScale;
+		if (isFacingLeft) scale.x *= -1;
+		decapitatedHead.transform.localScale = scale;
+
+		decapitatedHead.AddForce (new Vector3(0f, 5f, 0f), ForceMode.Impulse);
 		decapitatedHead.GetComponent<SpriteRenderer> ().sprite = head.sprite;
 
-		// Update the number of enemies left
-		GameManager.instance.enemiesLeft--;
-		if (GameManager.instance.enemiesLeft == 0) {
-			GameManager.instance.Win ();
-		}
+		decapitatedHead.GetComponent<CatHead> ().value = headValue;
 
 		Destroy (gameObject);
 	}
@@ -200,6 +213,14 @@ public class Cat : Destructible {
 		}
 
 		return count;
+	}
+
+	public void RemoveStatusEffect<T> () {
+		for (int i = statusEffects.Count - 1; i >= 0; i--) {
+			if (statusEffects [i].GetType () == typeof(T))
+				statusEffects [i].End ();
+				statusEffects.RemoveAt (i);
+		}
 	}
 
 	public void SetTint (Color color) {
@@ -294,7 +315,6 @@ public class Cat : Destructible {
 
 	public IEnumerator Fade (float opacity, float duration) {
 		float elapsedTime = 0.0f;
-
 		float startingOpacity = pelvis.material.color.a;
 
 		while (elapsedTime < duration) {
@@ -347,7 +367,7 @@ public class Cat : Destructible {
 
 				// Check if the cat has reached the control room
 				if (_currentRoom.roomName == "Control Room") {
-					GameManager.instance.Lose ();
+					LevelManager.instance.Lose ();
 				}
 			}
 		}

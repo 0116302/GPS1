@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 [RequireComponent(typeof(Animator))]
 public class Door : MonoBehaviour, ITriggerable {
@@ -13,18 +14,14 @@ public class Door : MonoBehaviour, ITriggerable {
 		get { return _isOpen; }
 	}
 
-	public bool _isBroken = false;
+	private bool _isBroken = false;
 	public bool isBroken {
 		get {
 			return _isBroken;
 		}
 	}
 
-	[Header ("Cooldown")]
-	public CooldownIndicator cooldownIndicator;
-	private float cooldown = 0.0f;
-	public float closeDuration = 10.0f;
-	public float cooldownDuration = 30.0f;
+	public List<Door> openOnClose = new List<Door> ();
 
 	[Header ("Staircase")]
 	public bool isStaircase = false;
@@ -42,24 +39,7 @@ public class Door : MonoBehaviour, ITriggerable {
 	}
 
 	void Update () {
-		if (cooldown > 0.0f) {
-			cooldown -= Time.deltaTime;
-
-			if (cooldownIndicator != null) {
-				cooldownIndicator.value = cooldown / cooldownDuration;
-			}
-
-			if (cooldown <= cooldownDuration - closeDuration) {
-				Open ();
-			}
-
-		} else {
-			cooldown = 0.0f;
-
-			if (cooldownIndicator != null) {
-				cooldownIndicator.value = 0.0f;
-			}
-		}
+		
 	}
 
 	public void OnHoverEnter () {
@@ -75,14 +55,21 @@ public class Door : MonoBehaviour, ITriggerable {
 	}
 
 	public void OnTrigger () {
-		if (playerControlled && !_isBroken && cooldown <= 0.0f) {
-			if (!isStaircase || !destination._isBroken) {
-				Close ();
-				cooldown = cooldownDuration;
+		if (playerControlled && !_isBroken && (!isStaircase || !destination.isBroken)) {
+			Close ();
 
-				if (isStaircase) {
-					destination.OnTrigger ();
+			foreach (Door door in openOnClose) {
+				if (!door._isBroken && (!door.isStaircase || !door.destination.isBroken)) {
+					door.Open ();
+
+					if (door.isStaircase) {
+						door.destination.Open ();
+					}
 				}
+			}
+
+			if (isStaircase) {
+				destination.Close ();
 			}
 		}
 	}

@@ -29,7 +29,7 @@ public class CatPoisonedStatusEffect : CatStatusEffect {
 	}
 
 	public override void Tick () {
-		cat.Damage (0.1f, DamageType.Poison);
+		cat.Damage (0.5f, DamageType.Poison);
 	}
 
 	public override void End () {

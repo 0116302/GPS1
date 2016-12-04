@@ -8,6 +8,8 @@ public class CatFrozenStatusEffect : CatStatusEffect {
 	}
 
 	public override void Start () {
+		if (cat.HasStatusEffect<CatBurningStatusEffect> () > 0) return; // A burning cat can't be frozen
+		
 		cat.animator.SetBool ("frozen", true);
 		cat.controller.frozen = true;
 		cat.SetTint (new Color32 (40, 196, 255, 255));

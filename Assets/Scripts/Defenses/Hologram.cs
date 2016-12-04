@@ -6,7 +6,8 @@ public class Hologram : Lure, IMultiTargeter {
 
 	public float activeDuration = 10.0f;
 
-	public SpriteRenderer projection; //TODO Replace this with actual animations
+	public SpriteRenderer projection;
+	SoundEffect sound;
 
 	public CooldownIndicator cooldownIndicator;
 	private float cooldown = 0.0f;
@@ -17,8 +18,9 @@ public class Hologram : Lure, IMultiTargeter {
 
 	List<Cat> targets = new List<Cat> ();
 
-	// Use this for initialization
-	void Start () {
+	void Awake () {
+		sound = GetComponent<SoundEffect> ();
+
 		projection.enabled = false;
 	}
 
@@ -77,6 +79,8 @@ public class Hologram : Lure, IMultiTargeter {
 		_isActive = true;
 		uses++;
 		projection.enabled = true;
+		if (sound != null) sound.Play (0);
+
 		StartCoroutine (DeactivateCoroutine ());
 
 		foreach (Cat enemy in targets) {

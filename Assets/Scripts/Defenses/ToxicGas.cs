@@ -7,20 +7,23 @@ public class ToxicGas :  Defense {
 	public float activeDuration = 4.0f;
 	float activeTime = 0.0f;
 
-	public float damagePerTick = 0.1f;
+	public float damagePerTick = 0.5f;
 	public float tickFrequency = 1.0f;
 
 	public new ParticleSystem particleSystem;
+	SoundEffect sound;
+
 	public CooldownIndicator cooldownIndicator;
 	bool used = false;
 
-	// Use this for initialization
-	void Start () {
-		
+	void Awake () {
+		sound = GetComponent<SoundEffect> ();
 	}
 
 	public void Activate () {
 		if (_isDisarmed) return;
+
+		if (sound != null) sound.Play (0);
 
 		activeTime = activeDuration;
 		StartCoroutine (Damage ());
@@ -28,7 +31,6 @@ public class ToxicGas :  Defense {
 
 	IEnumerator Damage () {
 		particleSystem.Play ();
-		Debug.Log ("Particles... AWAY!");
 
 		while (activeTime > 0.0f) {
 

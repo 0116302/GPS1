@@ -35,7 +35,7 @@ public class AcidDropPayload : MonoBehaviour {
 			Cat enemy = hit.GetComponent<Cat> ();
 			if (enemy != null) {
 				// Poison all enemies in the explosion radius
-				enemy.AddStatusEffect (new CatPoisonedStatusEffect (40.0f));
+				enemy.AddStatusEffect (new CatPoisonedStatusEffect (6.0f));
 			}
 		}
 

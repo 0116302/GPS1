@@ -10,6 +10,8 @@ public class CatBurningStatusEffect : CatStatusEffect {
 	}
 
 	public override void Start () {
+		cat.RemoveStatusEffect<CatFrozenStatusEffect> ();
+
 		cat.panickingState.Panic (duration);
 		particleSystem = CatParticleSystemManager.instance.Get (CatParticleSystem.Burning);
 		particleSystem.transform.parent = cat.transform;
@@ -36,7 +38,7 @@ public class CatBurningStatusEffect : CatStatusEffect {
 	}
 
 	public override void Tick () {
-		cat.Damage (0.1f, DamageType.Heat);
+		cat.Damage (0.5f, DamageType.Heat);
 	}
 
 	public override void End () {

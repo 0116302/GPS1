@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 
 public class SpacetimeRift :  Defense, IMultiTargeter {
+	
+	SoundEffect sound;
 
 	List<Cat> targets = new List<Cat> ();
 
@@ -10,9 +12,8 @@ public class SpacetimeRift :  Defense, IMultiTargeter {
 	private float cooldown = 0.0f;
 	public float cooldownDuration = 180.0f;
 
-	// Use this for initialization
-	void Start () {
-		
+	void Awake () {
+		sound = GetComponent<SoundEffect> ();
 	}
 
 	// Update is called once per frame
@@ -56,6 +57,8 @@ public class SpacetimeRift :  Defense, IMultiTargeter {
 
 	public void Activate () {
 		if (_isDisarmed) return;
+
+		if (sound != null) sound.Play (0);
 
 		for (int i = targets.Count - 1; i >= 0; i--) {
 			Cat enemy = targets [i];

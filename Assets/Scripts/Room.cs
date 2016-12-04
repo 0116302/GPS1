@@ -33,6 +33,8 @@ public class Room : MonoBehaviour {
 	[HideInInspector] public List<Cat> occupants = new List<Cat> ();
 
 	void Start () {
+		placementGrid.gameObject.SetActive (true);
+
 		Material material = placementGrid.GetComponent<Renderer> ().material;
 		Color color = material.color;
 		color.a = 0.0f;
