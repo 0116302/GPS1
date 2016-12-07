@@ -9,6 +9,9 @@ public class Door : MonoBehaviour, ITriggerable {
 	public bool openByDefault = true;
 	public bool playerControlled = true;
 
+	public CooldownIndicator cooldownIndicator;
+	SoundEffect sound;
+
 	private bool _isOpen = false;
 	public bool isOpen {
 		get { return _isOpen; }
@@ -33,9 +36,14 @@ public class Door : MonoBehaviour, ITriggerable {
 
 	void Awake () {
 		animator = GetComponent<Animator> ();
+		sound = GetComponent<SoundEffect> ();
+
 		animator.SetBool ("altDirection", alternateDirection);
 
-		if (openByDefault) Open ();
+		if (openByDefault) {
+			animator.SetBool ("isOpen", true);
+			_isOpen = true;
+		}
 	}
 
 	void Update () {
@@ -75,13 +83,19 @@ public class Door : MonoBehaviour, ITriggerable {
 	}
 
 	public void Open () {
-		animator.SetBool ("isOpen", true);
-		_isOpen = true;
+		if (!_isOpen) {
+			animator.SetBool ("isOpen", true);
+			_isOpen = true;
+			sound.Play (0);
+		}
 	}
 
 	public void Close () {
-		animator.SetBool ("isOpen", false);
-		_isOpen = false;
+		if (isOpen) {
+			animator.SetBool ("isOpen", false);
+			_isOpen = false;
+			sound.Play (1);
+		}
 	}
 
 	public void Toggle () {
@@ -97,8 +111,14 @@ public class Door : MonoBehaviour, ITriggerable {
 		_isOpen = true;
 		_isBroken = true;
 
+		if (cooldownIndicator != null)
+			cooldownIndicator.value = 1.0f;
+
 		if (isStaircase) {
 			destination.Open ();
+
+			if (destination.cooldownIndicator != null)
+				destination.cooldownIndicator.value = 1.0f;
 		}
 	}
 }

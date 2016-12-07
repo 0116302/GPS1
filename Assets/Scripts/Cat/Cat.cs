@@ -93,6 +93,9 @@ public class Cat : Destructible {
 		if (healthDisplay != null) {
 			healthDisplay.text = new string ('♥', Mathf.CeilToInt(this.health / this.maximumHealth * heartCount));
 		}
+
+		// Inform the level manager a new enemy has spawned
+		LevelManager.instance.enemiesOnScreen++;
 	}
 
 	protected virtual void AssignStates () {
@@ -130,9 +133,16 @@ public class Cat : Destructible {
 
 	void OnDestroyed () {
 		// Update the number of enemies left
+		LevelManager.instance.enemiesOnScreen--;
 		LevelManager.instance.enemiesLeft--;
+
 		if (LevelManager.instance.enemiesLeft == 0) {
+			// If all enemies are dead, trigger the win event
 			LevelManager.instance.Win ();
+
+		} else if (LevelManager.instance.enemiesOnScreen == 0) {
+			// If all enemies on screen are dead, spawn the next wave
+			LevelManager.instance.enemySpawner.SpawnNext ();
 		}
 
 		// Stop all status effect coroutines

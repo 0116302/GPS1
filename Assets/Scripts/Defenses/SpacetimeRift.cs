@@ -8,11 +8,13 @@ public class SpacetimeRift :  Defense, IMultiTargeter {
 
 	List<Cat> targets = new List<Cat> ();
 
+	public Animator animator;
 	public CooldownIndicator cooldownIndicator;
 	private float cooldown = 0.0f;
 	public float cooldownDuration = 180.0f;
 
 	void Awake () {
+		animator = GetComponent<Animator> ();
 		sound = GetComponent<SoundEffect> ();
 	}
 
@@ -58,6 +60,7 @@ public class SpacetimeRift :  Defense, IMultiTargeter {
 	public void Activate () {
 		if (_isDisarmed) return;
 
+		animator.SetTrigger ("activate");
 		if (sound != null) sound.Play (0);
 
 		for (int i = targets.Count - 1; i >= 0; i--) {

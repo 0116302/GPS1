@@ -19,7 +19,7 @@ public class Game {
 
 	public Game () {
 		levelUnlocked [0] = true;
-		levelCash [0] = 30000;
+		levelCash [0] = 15000;
 	}
 
 	public static void Pause () {

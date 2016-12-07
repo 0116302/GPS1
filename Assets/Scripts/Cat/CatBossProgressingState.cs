@@ -185,6 +185,25 @@ public class CatBossProgressingState : CatProgressingState {
 		if (_isBreakingDoor || door == null) yield break;
 		_isBreakingDoor = true;
 
+		int r = Random.Range (1, 6);
+		switch (r) {
+		case 1:
+			cat.Say ("Out of my way!");
+			break;
+		case 2:
+			cat.Say ("THIS IS SPARTA!");
+			break;
+		case 3:
+			cat.Say ("I know Kung Fu!");
+			break;
+		case 4:
+			cat.Say ("I don't think so...");
+			break;
+		case 5:
+			cat.Say ("Nice try");
+			break;
+		}
+
 		cat.controller.StopMoving ();
 		cat.animator.SetTrigger ("breakDoor");
 

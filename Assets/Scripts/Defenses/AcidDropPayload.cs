@@ -10,10 +10,12 @@ public class AcidDropPayload : MonoBehaviour {
 
 	new SpriteRenderer renderer;
 	public new ParticleSystem particleSystem;
+	SoundEffect sound;
 
 	// Use this for initialization
 	void Awake () {
 		renderer = GetComponent<SpriteRenderer> ();
+		sound = GetComponent<SoundEffect> ();
 	}
 
 	void OnCollisionEnter (Collision collision) {
@@ -27,6 +29,8 @@ public class AcidDropPayload : MonoBehaviour {
 		particleSystem.Emit (particleCount);
 		particleSystem.Stop ();
 		renderer.enabled = false;
+
+		sound.Play (0);
 
 		int layerMask = 1 << LayerMask.NameToLayer("Enemies");
 		Collider[] hits = Physics.OverlapSphere (transform.position, explosionRadius, layerMask, QueryTriggerInteraction.Ignore);

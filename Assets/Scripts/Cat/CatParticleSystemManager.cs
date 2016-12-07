@@ -2,7 +2,8 @@
 using System.Collections;
 
 public enum CatParticleSystem {
-	Burning = 0
+	Burning = 0,
+	Poisoned
 }
 
 public class CatParticleSystemManager : MonoBehaviour {
@@ -18,6 +19,7 @@ public class CatParticleSystemManager : MonoBehaviour {
 	}
 
 	public GameObject burning;
+	public GameObject poisoned;
 
 	void Awake () {
 		if (_instance == null)
@@ -33,6 +35,9 @@ public class CatParticleSystemManager : MonoBehaviour {
 		switch (type) {
 		case CatParticleSystem.Burning:
 			template = burning;
+			break;
+		case CatParticleSystem.Poisoned:
+			template = poisoned;
 			break;
 		}
 

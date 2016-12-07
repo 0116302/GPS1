@@ -191,7 +191,7 @@ public class CatDetectiveProgressingState : CatProgressingState {
 			if (defense != null && defense.canBeDisarmed && !defense.isDisarmed && (!canBeLured || !(defense is Lure))) {
 				// Disarm trap
 
-				int r = Random.Range (1, 5);
+				int r = Random.Range (1, 6);
 				switch (r) {
 				case 1:
 					cat.Say ("Is anyone gonna fall for this?");

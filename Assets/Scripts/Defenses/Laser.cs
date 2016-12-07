@@ -58,7 +58,12 @@ public class Laser : Defense, ITargeter {
 	}
 
 	public void SetTarget (Transform target) {
-		_target = target;
+		if (target == null) return;
+
+		Cat cat = target.GetComponent<Cat> ();
+		if (cat != null && cat.currentRoom == placeableParent.room) {
+			_target = target;
+		}
 	}
 
 	public override void OnTrigger () {

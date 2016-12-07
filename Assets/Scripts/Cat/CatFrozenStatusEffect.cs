@@ -13,6 +13,25 @@ public class CatFrozenStatusEffect : CatStatusEffect {
 		cat.animator.SetBool ("frozen", true);
 		cat.controller.frozen = true;
 		cat.SetTint (new Color32 (40, 196, 255, 255));
+
+		int r = Random.Range (1, 6);
+		switch (r) {
+		case 1:
+			cat.Say ("CAN'T... MOVE...");
+			break;
+		case 2:
+			cat.Say ("C-c-C-Cold!");
+			break;
+		case 3:
+			cat.Say ("I need a blanket!");
+			break;
+		case 4:
+			cat.Say ("Who messed with the thermostat!?");
+			break;
+		case 5:
+			cat.Say ("Not again!");
+			break;
+		}
 	}
 
 	public override void End () {

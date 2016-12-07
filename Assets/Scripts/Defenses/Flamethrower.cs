@@ -57,6 +57,8 @@ public class Flamethrower : Defense, ITargeter {
 	}
 
 	public void SetTarget (Transform target) {
+		if (target == null) return;
+
 		Cat cat = target.GetComponent<Cat> ();
 		if (cat != null && cat.currentRoom == placeableParent.room) {
 			_target = target;

@@ -5,10 +5,12 @@ using System.Collections.Generic;
 public class ElectricCarpet : Defense, IMultiTargeter {
 
 	public float damage = 1.0f;
-	public float activeDuration = 10.0f;
+	public float activeDuration = 1.0f;
 
 	bool _isActive = false;
 	float activeTime = 0.0f;
+
+	SoundEffect sound;
 
 	public CooldownIndicator cooldownIndicator;
 	private float cooldown = 0.0f;
@@ -17,8 +19,8 @@ public class ElectricCarpet : Defense, IMultiTargeter {
 	List<Cat> targets = new List<Cat> ();
 
 	// Use this for initialization
-	void Start () {
-		
+	void Awake () {
+		sound = GetComponent<SoundEffect> ();
 	}
 
 	// Update is called once per frame
@@ -85,6 +87,8 @@ public class ElectricCarpet : Defense, IMultiTargeter {
 
 		_isActive = true;
 		activeTime = activeDuration;
+
+		sound.Play (0);
 
 		foreach (Cat enemy in targets) {
 			if (enemy == null)

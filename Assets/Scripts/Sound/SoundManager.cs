@@ -19,7 +19,10 @@ public class SoundManager : MonoBehaviour {
 	public string musicVolumeSetting = "musicVolume";
 
 	[Header ("Background Music")]
-	public AudioSource bgmSource;
+	public AudioSource BGMSource;
+	public AudioClip defaultBGM;
+	public bool autoplay = false;
+	public bool loop = true;
 
 	void Awake () {
 		if (_instance == null)
@@ -27,14 +30,20 @@ public class SoundManager : MonoBehaviour {
 		else if (instance != this)
 			Destroy(gameObject);
 
-		bgmSource.ignoreListenerPause = true;
-		bgmSource.loop = true;
-		bgmSource.volume = GetMusicVolume () * GetMasterVolume ();
+		BGMSource.ignoreListenerPause = true;
+		BGMSource.volume = GetMusicVolume () * GetMasterVolume ();
+
+		if (autoplay) {
+			BGMSource.clip = defaultBGM;
+			BGMSource.loop = loop;
+			BGMSource.Play ();
+		}
 	}
 
-	public void PlayBGM (AudioClip clip) {
-		bgmSource.clip = clip;
-		bgmSource.Play ();
+	public void PlayBGM (AudioClip clip, bool loop = true) {
+		BGMSource.clip = clip;
+		BGMSource.loop = loop;
+		BGMSource.Play ();
 	}
 
 	public float GetMasterVolume () {
@@ -51,7 +60,7 @@ public class SoundManager : MonoBehaviour {
 
 	public void SetMasterVolume (float value) {
 		PlayerPrefs.SetFloat (masterVolumeSetting, value);
-		bgmSource.volume = GetMusicVolume () * GetMasterVolume ();
+		BGMSource.volume = GetMusicVolume () * GetMasterVolume ();
 	}
 
 	public void SetSoundVolume (float value) {
@@ -60,6 +69,6 @@ public class SoundManager : MonoBehaviour {
 
 	public void SetMusicVolume (float value) {
 		PlayerPrefs.SetFloat (musicVolumeSetting, value);
-		bgmSource.volume = GetMusicVolume () * GetMasterVolume ();
+		BGMSource.volume = GetMusicVolume () * GetMasterVolume ();
 	}
 }

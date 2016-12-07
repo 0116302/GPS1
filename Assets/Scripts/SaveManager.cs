@@ -5,7 +5,7 @@ using System.IO;
 
 public class SaveManager : MonoBehaviour {
 
-	public static string saveFile = "save.save";
+	public static string saveFile = "save.dat";
 
 	public static void Save () {
 		// Save the player's progress into a file

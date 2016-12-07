@@ -11,6 +11,8 @@ public class CatElectrocutedStatusEffect : CatStatusEffect {
 		cat.animator.SetBool ("beingElectrocuted", true);
 		cat.controller.frozen = true;
 		cat.SetTint (new Color32 (255, 240, 0, 255));
+
+		cat.Say ("*zap*");
 	}
 
 	public override void End () {

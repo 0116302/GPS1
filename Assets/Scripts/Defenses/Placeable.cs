@@ -38,6 +38,8 @@ public class Placeable : MonoBehaviour {
 		set { _placed = value; }
 	}
 
+	SoundEffect sound;
+
 	[HideInInspector] public Room room = null;
 
 	private Transform placementGrid;
@@ -45,6 +47,10 @@ public class Placeable : MonoBehaviour {
 
 	void OnEnable () {
 		_conflictCount = 0;
+	}
+
+	void Awake () {
+		sound = GetComponent<SoundEffect> ();
 	}
 
 	public virtual bool CanBePlacedHere (int x, int y, int gridWidth, int gridHeight) {
@@ -112,7 +118,8 @@ public class Placeable : MonoBehaviour {
 	}
 
 	public virtual void OnPlace () {
-		// Do nothing by default
+		// Play a sound effect
+		if (sound != null) sound.Play (0);
 	}
 
 	public virtual void OnRemove () {

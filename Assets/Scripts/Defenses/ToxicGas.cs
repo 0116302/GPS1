@@ -14,10 +14,30 @@ public class ToxicGas :  Defense {
 	SoundEffect sound;
 
 	public CooldownIndicator cooldownIndicator;
-	bool used = false;
+	private float cooldown = 0.0f;
+	public float cooldownDuration = 30.0f;
 
 	void Awake () {
 		sound = GetComponent<SoundEffect> ();
+	}
+
+	void Update () {
+		if (placeableParent != null && !placeableParent.placed) return;
+
+		if (cooldown > 0.0f) {
+			cooldown -= Time.deltaTime;
+
+			if (cooldownIndicator != null) {
+				cooldownIndicator.value = cooldown / cooldownDuration;
+			}
+
+		} else {
+			cooldown = 0.0f;
+
+			if (cooldownIndicator != null) {
+				cooldownIndicator.value = 0.0f;
+			}
+		}
 	}
 
 	public void Activate () {
@@ -55,13 +75,10 @@ public class ToxicGas :  Defense {
 	}
 
 	public override void OnTrigger () {
-		if (!used) {
+		if (cooldown <= 0.0f) {
 			Activate ();
 
-			used = true;
-			if (cooldownIndicator != null) {
-				cooldownIndicator.value = 1.0f;
-			}
+			cooldown = cooldownDuration;
 		}
 	}
 }

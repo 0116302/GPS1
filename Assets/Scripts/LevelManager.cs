@@ -32,12 +32,26 @@ public class LevelManager : MonoBehaviour {
 
 	[Header ("Level Setup")]
 	public TimedSpawner enemySpawner;
-	public int enemyCount = 30;
 
 	[HideInInspector]
 	public int enemiesLeft;
 	[HideInInspector]
+	public int enemiesOnScreen = 0;
+	[HideInInspector]
 	public int cash;
+
+	public Transform bonusObjective1;
+	public int bonus1Amount = 500;
+	[HideInInspector]
+	public bool bonus1Received = true;
+	public Transform bonusObjective2;
+	public int bonus2Amount = 750;
+	[HideInInspector]
+	public bool bonus2Received = true;
+	public Transform bonusObjective3;
+	public int bonus3Amount = 1000;
+	[HideInInspector]
+	public bool bonus3Received = true;
 
 	[Header ("Music")]
 	public AudioClip setupPhaseBGM;
@@ -51,8 +65,7 @@ public class LevelManager : MonoBehaviour {
 	}
 
 	void Start () {
-		enemyCount = enemySpawner.spawns.Count;
-		enemiesLeft = enemyCount;
+		enemiesLeft = enemySpawner.spawns.Count;
 		cash = Game.current.levelCash[LevelLoader.instance.currentLevel];
 
 		Debug.Log ("Started level " + LevelLoader.instance.currentLevel + " with $" + cash + "!");
@@ -79,6 +92,19 @@ public class LevelManager : MonoBehaviour {
 
 	public void Win () {
 		_gamePhase = GamePhase.Win;
+
+		if (bonus1Received) {
+			cash += bonus1Amount;
+		}
+
+		if (bonus2Received) {
+			cash += bonus2Amount;
+		}
+
+		if (bonus3Received) {
+			cash += bonus3Amount;
+		}
+
 		Invoke ("WinGUI", 3.0f);
 
 		// Unlock the next level

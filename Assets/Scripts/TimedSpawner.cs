@@ -21,7 +21,15 @@ public class TimedSpawner : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		elapsedTime += Time.deltaTime;
-		if (spawns.Count >= 1 && elapsedTime >= spawns[0].delay) {
+		if (spawns.Count > 0 && elapsedTime >= spawns[0].delay) {
+			GameObject.Instantiate (spawns[0].prefab, transform.position, transform.rotation);
+			spawns.RemoveAt (0);
+			elapsedTime = 0.0f;
+		}
+	}
+
+	public void SpawnNext () {
+		if (spawns.Count > 0) {
 			GameObject.Instantiate (spawns[0].prefab, transform.position, transform.rotation);
 			spawns.RemoveAt (0);
 			elapsedTime = 0.0f;

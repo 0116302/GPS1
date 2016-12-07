@@ -6,7 +6,6 @@ public class CreditsScript : MonoBehaviour
 {
 	public void Credits()
 	{
-		//Application.LoadLevel("Credits");
 		SceneManager.LoadScene("Credits");
 	}
 }

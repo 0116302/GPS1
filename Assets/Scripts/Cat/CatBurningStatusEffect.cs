@@ -17,7 +17,7 @@ public class CatBurningStatusEffect : CatStatusEffect {
 		particleSystem.transform.parent = cat.transform;
 		particleSystem.transform.localPosition = Vector3.zero;
 
-		int r = Random.Range (1, 5);
+		int r = Random.Range (1, 6);
 		switch (r) {
 		case 1:
 			cat.Say ("I'M ON FIRE!!");

@@ -50,6 +50,8 @@ public class GUIManager : MonoBehaviour {
 		}
 	}
 
+	bool shopOpened = false;
+
 	[Header ("Settings")]
 	public GameObject settingsWindow;
 	public SegmentedSlider masterVolumeSlider;
@@ -72,6 +74,8 @@ public class GUIManager : MonoBehaviour {
 	}
 
 	[Header ("HUD")]
+	public Text cashDisplay;
+	public Text enemyCountDisplay;
 	public Text roomNameDisplay;
 
 	[Header ("Win/Lose")]
@@ -98,6 +102,12 @@ public class GUIManager : MonoBehaviour {
 		musicVolumeSlider.value = SoundManager.instance.GetMusicVolume ();
 
 		shopPlayerCash.text = "$" + LevelManager.instance.cash;
+		startButton.interactable = false; // Disable the start button until the player has opened the store at least once
+	}
+
+	void Update () {
+		cashDisplay.text = "$" + LevelManager.instance.cash.ToString ("N");
+		enemyCountDisplay.text = LevelManager.instance.enemiesLeft.ToString ("D");
 	}
 
 	public void PlayHoverSound () {
@@ -116,9 +126,11 @@ public class GUIManager : MonoBehaviour {
 		if (player.playerMode == PlayerMode.Activation)
 			return;
 
-		shopPlayerCash.text = "$" + LevelManager.instance.cash;
+		shopPlayerCash.text = "$" + LevelManager.instance.cash.ToString ("N");
 		shopWindow.SetActive (true);
 		player.enabled = false;
+		shopOpened = true;
+		startButton.interactable = true;
 	}
 
 	public void ShopClose () {
@@ -149,12 +161,15 @@ public class GUIManager : MonoBehaviour {
 	}
 
 	public void ShopBuy () {
-		ShopClose ();
+		Placeable item = shopSelectedPrefab.GetComponent<Placeable> ();
+		if (item != null && LevelManager.instance.cash >= item.cost) {
+			ShopClose ();
 
-		if (player.cameraMode != CameraMode.RoomView)
-			player.SwitchToRoomView (defaultRoom);
-		
-		player.EnterPlacementMode (shopSelectedPrefab);
+			if (player.cameraMode != CameraMode.RoomView)
+				player.SwitchToRoomView (defaultRoom);
+
+			player.EnterPlacementMode (shopSelectedPrefab);
+		}
 	}
 
 	public void ShopSell () {
@@ -175,7 +190,7 @@ public class GUIManager : MonoBehaviour {
 	}
 
 	public void SettingsClose () {
-		startButton.interactable = LevelManager.instance.gamePhase == GamePhase.Setup;
+		startButton.interactable = LevelManager.instance.gamePhase == GamePhase.Setup && shopOpened;
 		shopButton.interactable = LevelManager.instance.gamePhase == GamePhase.Setup;
 
 		settingsWindow.SetActive (false);
@@ -204,7 +219,7 @@ public class GUIManager : MonoBehaviour {
 	}
 
 	public void QuitMenuClose () {
-		startButton.interactable = LevelManager.instance.gamePhase == GamePhase.Setup;
+		startButton.interactable = LevelManager.instance.gamePhase == GamePhase.Setup && shopOpened;
 		shopButton.interactable = LevelManager.instance.gamePhase == GamePhase.Setup;
 
 		quitWindow.SetActive (false);
@@ -254,13 +269,6 @@ public class GUIManager : MonoBehaviour {
 
 	public void Win () {
 		winMessage.text = "YOU MADE IT THROUGH DAY " + (LevelLoader.instance.currentLevel + 1).ToString ("D") + " WITH $" + LevelManager.instance.cash.ToString ("D") + " TO SPARE!";
-
-		if (LevelLoader.instance.currentLevel < Game.levelCount - 1) {
-			nextLevelButton.interactable = true;
-		} else {
-			nextLevelButton.interactable = false;
-		}
-
 		winScreen.SetActive (true);
 		player.enabled = false;
 		Game.Pause ();
@@ -282,6 +290,9 @@ public class GUIManager : MonoBehaviour {
 		int currentLevel = LevelLoader.instance.currentLevel;
 		if (currentLevel < Game.levelCount - 1) {
 			LevelLoader.instance.LoadLevel (currentLevel + 1);
+
+		} else {
+			SceneManager.LoadScene ("Credits");
 		}
 	}
 

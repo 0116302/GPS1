@@ -83,7 +83,7 @@ public class CatDefaultLuredState : CatLuredState {
 				cat.FaceLeft ();
 			}
 
-			int r = Random.Range (1, 5);
+			int r = Random.Range (1, 6);
 			switch (r) {
 			case 1:
 				cat.Say ("What's a fine cat like you doing in a place like this?");
